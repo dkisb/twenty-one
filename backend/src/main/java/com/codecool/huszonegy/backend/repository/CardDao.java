@@ -10,6 +10,4 @@ public interface CardDao {
 
     void addCard(Card card);
     Optional<Card> findCardById(int id) throws SQLException;
-    List<Integer> getShuffledCardIds();
-    List<Card> getShuffledDeck() throws SQLException;
 }

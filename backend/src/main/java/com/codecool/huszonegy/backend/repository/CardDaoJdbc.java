@@ -63,29 +63,4 @@ public class CardDaoJdbc implements CardDao {
             return Optional.empty();
         }
     }
-
-    public List<Integer> getShuffledCardIds() {
-        List<Integer> cardIds = IntStream.rangeClosed(1, 32)
-                .boxed()
-                .collect(Collectors.toList());
-        Collections.shuffle(cardIds);
-        cardIds.forEach(id -> System.out.print(id + " "));
-
-        return cardIds;
-    }
-    @Override
-    public List<Card> getShuffledDeck() throws SQLException {
-        List<Integer> shuffledIds = getShuffledCardIds();
-
-        List<Card> cards = new ArrayList<>();
-        for (int id : shuffledIds) {
-            Optional<Card> optionalCard = findCardById(id);
-            if (optionalCard.isEmpty()) {
-                throw new IllegalStateException("Card with ID " + id + " not found!");
-            }
-            cards.add(optionalCard.get());
-        }
-        return cards;
-    }
-
 }

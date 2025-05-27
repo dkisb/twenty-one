@@ -24,7 +24,5 @@ public class BackendApplication {
 		};
 	}*/
 
-	ShuffleCards shuffleCards = new ShuffleCards();
-	List<Integer> ids = shuffleCards.getShuffledCardIds();
 
 }

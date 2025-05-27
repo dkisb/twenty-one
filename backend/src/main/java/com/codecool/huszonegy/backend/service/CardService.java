@@ -6,9 +6,8 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -54,10 +53,22 @@ public class CardService {
                 .boxed()
                 .collect(Collectors.toList());
         Collections.shuffle(cardIds);
-        cardIds.forEach(id -> System.out.print(id + " "));
-        System.out.println();
 
         return cardIds;
+    }
+
+    public List<Card> getShuffledDeck() throws SQLException {
+        List<Integer> shuffledIds = getShuffledCardIds();
+
+        List<Card> cards = new ArrayList<>();
+        for (int id : shuffledIds) {
+            Optional<Card> optionalCard = repository.findCardById(id);
+            if (optionalCard.isEmpty()) {
+                throw new IllegalStateException("Card with ID " + id + " not found!");
+            }
+            cards.add(optionalCard.get());
+        }
+        return cards;
     }
 
 }
