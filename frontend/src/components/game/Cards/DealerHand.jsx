@@ -3,7 +3,7 @@ function DealerHand({ dealerHandData, dealerHand, dealerHandValue, enoughClicked
     <div className="dealers-hand">
       {dealerHandData.map((item, index) => {
         const showFront = enoughClicked || (dealerHandValue > 21 && dealerHand.length > 2);
-        const imageSrc = `http://localhost:3000${showFront ? item.frontImage : item.backImage}`;
+        const imageSrc = `/images/${showFront ? item.frontImage : item.backImage}`;
         const altText = showFront ? `Dealer card showing ${item.name}` : 'Card back';
 
         return (

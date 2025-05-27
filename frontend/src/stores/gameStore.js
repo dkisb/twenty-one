@@ -29,7 +29,7 @@ const useGameStore = create((set, get) => ({
       }
 
       // Fetch card data from the API
-      const response = await fetch(`/api/cards/${nextCardId}`);
+      const response = await fetch(`/cards/${nextCardId}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch card data: ${response.statusText}`);
       }

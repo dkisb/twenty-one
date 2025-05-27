@@ -4,7 +4,7 @@ function PlayerHand({ yourHandData, yourHandValue, user }) {
       {yourHandData.map((item, index) => (
         <img
           key={index}
-          src={`http://localhost:3000${item.frontImage}`}
+          src={`/images/${item.frontImage}`}
           alt={`Player card: ${item.name || 'Unknown card'}`}
           className="player-card"
         />
