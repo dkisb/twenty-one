@@ -6,7 +6,11 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class CardService {
@@ -44,4 +48,16 @@ public class CardService {
         }
         System.out.println("✅ All 32 cards inserted.");
     }
+
+    public List<Integer> getShuffledCardIds() {
+        List<Integer> cardIds = IntStream.rangeClosed(1, 32)
+                .boxed()
+                .collect(Collectors.toList());
+        Collections.shuffle(cardIds);
+        cardIds.forEach(id -> System.out.print(id + " "));
+        System.out.println();
+
+        return cardIds;
+    }
+
 }

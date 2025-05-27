@@ -1,10 +1,13 @@
 package com.codecool.huszonegy.backend;
 
 import com.codecool.huszonegy.backend.service.CardService;
+import com.codecool.huszonegy.backend.service.ShuffleCards;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+
+import java.util.List;
 
 
 @SpringBootApplication
@@ -21,5 +24,7 @@ public class BackendApplication {
 		};
 	}*/
 
+	ShuffleCards shuffleCards = new ShuffleCards();
+	List<Integer> ids = shuffleCards.getShuffledCardIds();
 
 }
