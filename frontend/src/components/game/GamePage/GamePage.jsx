@@ -1,4 +1,3 @@
-import './GamePage.css';
 import { useEffect } from 'react';
 import Cards from '../Cards/Cards.jsx';
 import DisplayBalances from '../utils/displaybalances';

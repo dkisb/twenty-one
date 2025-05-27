@@ -1,9 +1,8 @@
-import './StartPage.css';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import GamePage from '../GamePage/GamePage';
 import StartScreen from './StartScreen';
-import startStore from './startStore';
+import startStore from '../../../stores/startStore';
 
 function StartPage({ onLoggedIn, onSuccessfulRegister, onActiveUser }) {
   const location = useLocation();

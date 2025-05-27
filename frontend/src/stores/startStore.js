@@ -1,4 +1,4 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 const startStore = create(
@@ -16,12 +16,12 @@ const startStore = create(
       // Game Actions
       startGame: async () => {
         try {
-          const response = await fetch('/cards');
+          const response = await fetch('/api/cards');
           const cardIds = await response.json();
           set({ randomCardIds: cardIds });
 
           const cardId = cardIds[0];
-          const response2 = await fetch(`/cards/${cardId}`);
+          const response2 = await fetch(`/api/cards/${cardId}`);
           const cardData = await response2.json();
 
           set({
