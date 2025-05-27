@@ -6,41 +6,35 @@ import StartScreen from './StartScreen';
 import startStore from './startStore';
 
 function StartPage({ onLoggedIn, onSuccessfulRegister, onActiveUser }) {
-    const location = useLocation();
-    const {
-        gameStarted,
-        startGame,
-        getCardIds,
-        getUserData,
-        setUser,
-        setDealerBalance,
-    } = startStore();
+  const location = useLocation();
+  const { gameStarted, startGame, getCardIds, getUserData, setUser, setDealerBalance } = startStore();
 
-    useEffect(() => {
-        const loggedInUser = location.state;
-        if (loggedInUser) {
-            setUser(loggedInUser);
-            setDealerBalance(loggedInUser.dealerBalance ?? 100);
-        }
-    }, [location.state]);
+  useEffect(() => {
+    const loggedInUser = location.state;
+    if (loggedInUser) {
+      setUser(loggedInUser);
+      setDealerBalance(loggedInUser.dealerBalance ?? 100);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state]);
 
-    const handleStartGame = async () => {
-        await startGame(); // fetches and sets shuffled card IDs + first card
-    };
+  const handleStartGame = async () => {
+    await startGame(); // fetches and sets shuffled card IDs + first card
+  };
 
-    return gameStarted && getCardIds() ? (
-        <GamePage
-            randomCards={getCardIds()}
-            gameStarted={gameStarted}
-            user={getUserData()}
-            dealerMoney={startStore.getState().getDealerBalance()}
-            onLoggedIn={onLoggedIn}
-            onSuccessfulRegister={onSuccessfulRegister}
-            onActiveUser={onActiveUser}
-        />
-    ) : (
-        <StartScreen userData={getUserData()} onStart={handleStartGame} />
-    );
+  return gameStarted && getCardIds() ? (
+    <GamePage
+      randomCards={getCardIds()}
+      gameStarted={gameStarted}
+      user={getUserData()}
+      dealerMoney={startStore.getState().getDealerBalance()}
+      onLoggedIn={onLoggedIn}
+      onSuccessfulRegister={onSuccessfulRegister}
+      onActiveUser={onActiveUser}
+    />
+  ) : (
+    <StartScreen userData={getUserData()} onStart={handleStartGame} />
+  );
 }
 
 export default StartPage;
