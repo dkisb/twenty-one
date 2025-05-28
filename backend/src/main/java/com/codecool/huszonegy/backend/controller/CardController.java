@@ -18,9 +18,4 @@ public class CardController {
     public CardController(CardService service) {
         this.service = service;
     }
-
-    @GetMapping("/")
-    public List<Card> getDeck() throws SQLException {
-        return service.getShuffledDeck();
-    }
 }

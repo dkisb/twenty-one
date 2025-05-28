@@ -14,10 +14,10 @@ import java.util.stream.IntStream;
 @Service
 public class CardService {
 
-    private final CardDao repository;
+    private final CardDao cardDao;
 
-    public CardService(CardDao repository) {
-        this.repository = repository;
+    public CardService(CardDao cardDao) {
+        this.cardDao = cardDao;
     }
 
     public void generateAllCards() throws Exception {
@@ -40,7 +40,7 @@ public class CardService {
                 byte[] frontImage = Files.readAllBytes(frontPath);
 
                 Card card = new Card(name, color, value, frontImage, backImage);
-                repository.addCard(card);
+                cardDao.addCard(card);
 
                 cardNumber++;
             }
@@ -48,7 +48,7 @@ public class CardService {
         System.out.println("✅ All 32 cards inserted.");
     }
 
-    private List<Integer> getShuffledCardIds() {
+    public List<Integer> getShuffledCardIds() {
         List<Integer> cardIds = IntStream.rangeClosed(1, 32)
                 .boxed()
                 .collect(Collectors.toList());
@@ -57,17 +57,4 @@ public class CardService {
         return cardIds;
     }
 
-    public List<Card> getShuffledDeck() throws SQLException {
-        List<Integer> shuffledIds = getShuffledCardIds();
-
-        List<Card> cards = new ArrayList<>();
-        for (int id : shuffledIds) {
-            Optional<Card> optionalCard = repository.findCardById(id);
-            if (optionalCard.isEmpty()) {
-                throw new IllegalStateException("Card with ID " + id + " not found!");
-            }
-            cards.add(optionalCard.get());
-        }
-        return cards;
-    }
 }
