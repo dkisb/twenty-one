@@ -1,18 +1,13 @@
 package com.codecool.huszonegy.backend.repository;
 
-import com.codecool.huszonegy.backend.cards.Card;
+import com.codecool.huszonegy.backend.model.Card;
 import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Repository
 public class CardDaoJdbc implements CardDao {

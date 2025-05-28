@@ -1,6 +1,6 @@
 package com.codecool.huszonegy.backend.service;
 
-import com.codecool.huszonegy.backend.cards.Card;
+import com.codecool.huszonegy.backend.model.Card;
 import com.codecool.huszonegy.backend.repository.CardDao;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,7 @@ public class CardService {
         this.repository = repository;
     }
 
-    private void generateAllCards() throws Exception {
+    public void generateAllCards() throws Exception {
         List<String> names = List.of("unter", "ober", "king", "seven", "eight", "nine", "ten", "ace");
         List<Integer> values = List.of(2, 3, 4, 7, 8, 9, 10, 11);
         List<String> colors = List.of("acorn", "bell", "heart", "leaf");

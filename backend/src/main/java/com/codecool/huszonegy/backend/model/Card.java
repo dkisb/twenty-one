@@ -1,4 +1,4 @@
-package com.codecool.huszonegy.backend.cards;
+package com.codecool.huszonegy.backend.model;
 
 import lombok.Getter;
 import lombok.Setter;

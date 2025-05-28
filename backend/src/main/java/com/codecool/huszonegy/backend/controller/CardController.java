@@ -1,6 +1,6 @@
 package com.codecool.huszonegy.backend.controller;
 
-import com.codecool.huszonegy.backend.cards.Card;
+import com.codecool.huszonegy.backend.model.Card;
 import com.codecool.huszonegy.backend.service.CardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
