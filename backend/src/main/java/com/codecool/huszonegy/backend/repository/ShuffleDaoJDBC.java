@@ -9,13 +9,15 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Base64;
 
 @Repository
 public class ShuffleDaoJDBC implements ShuffleDao {
     private final DataSource dataSource;
 
-    public ShuffleDaoJDBC(DataSource dataSource, CardService cardService) {
+    public ShuffleDaoJDBC(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -34,4 +36,38 @@ public class ShuffleDaoJDBC implements ShuffleDao {
             throw new RuntimeException(e);
         }
     }
-}
+
+    @Override
+    public Card getNextCardInLine(int order, int userId) {
+        String sql = """
+        SELECT c.id, c.name, c.color, c.value, c.front_image
+        FROM shuffles s
+        JOIN cards c ON s.card_id = c.id
+        WHERE s.user_id = ? AND s.card_order = ?
+    """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            stmt.setInt(2, order);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Card card = new Card(
+                        rs.getString("name"),
+                        rs.getString("color"),
+                        rs.getInt("value"),
+                        rs.getBytes("front_image")
+                );
+                card.setId(rs.getInt("id"));
+                return card;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get next card in line", e);
+        }
+
+        return null;
+    }}
+

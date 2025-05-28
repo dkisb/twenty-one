@@ -19,7 +19,7 @@ public class CardDaoJdbc implements CardDao {
 
     @Override
     public void addCard(Card card) {
-        String sql = "INSERT INTO cards (name, color, value, front_image, back_image) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO cards (name, color, value, front_image) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -27,7 +27,6 @@ public class CardDaoJdbc implements CardDao {
             stmt.setString(2, card.getColor());
             stmt.setInt(3, card.getValue());
             stmt.setBytes(4, card.getFrontImageData());
-            stmt.setBytes(5, card.getBackImageData());
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -45,12 +44,12 @@ public class CardDaoJdbc implements CardDao {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
+                byte[] imageBytes = rs.getBytes("front_image");
                 Card card = new Card(
                         rs.getString("name"),
                         rs.getString("color"),
                         rs.getInt("value"),
-                        rs.getBytes("front_image"),
-                        rs.getBytes("back_image")
+                        imageBytes
                 );
                 card.setId(rs.getInt("id"));
                 return Optional.of(card);

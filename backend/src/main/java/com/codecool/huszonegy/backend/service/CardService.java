@@ -25,8 +25,6 @@ public class CardService {
         List<Integer> values = List.of(2, 3, 4, 7, 8, 9, 10, 11);
         List<String> colors = List.of("acorn", "bell", "heart", "leaf");
 
-        byte[] backImage = Files.readAllBytes(Path.of("images/Back.jpg"));
-
         int cardNumber = 1;
         for (String color : colors) {
             for (int i = 0; i < names.size(); i++) {
@@ -39,7 +37,7 @@ public class CardService {
 
                 byte[] frontImage = Files.readAllBytes(frontPath);
 
-                Card card = new Card(name, color, value, frontImage, backImage);
+                Card card = new Card(name, color, value, frontImage);
                 cardDao.addCard(card);
 
                 cardNumber++;
