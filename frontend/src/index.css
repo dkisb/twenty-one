@@ -2,9 +2,6 @@
 @plugin "daisyui" {
   themes: light --default;
 }
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 @layer utilities {
   .bg-poker-table {
