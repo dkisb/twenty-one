@@ -1,9 +1,8 @@
 package com.codecool.huszonegy.backend.repository;
 
-import com.codecool.huszonegy.backend.cards.Card;
+import com.codecool.huszonegy.backend.model.Card;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
 
 public interface CardDao {
