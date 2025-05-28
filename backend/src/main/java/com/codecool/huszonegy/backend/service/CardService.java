@@ -20,7 +20,7 @@ public class CardService {
         this.repository = repository;
     }
 
-    public void generateAllCards() throws Exception {
+    private void generateAllCards() throws Exception {
         List<String> names = List.of("unter", "ober", "king", "seven", "eight", "nine", "ten", "ace");
         List<Integer> values = List.of(2, 3, 4, 7, 8, 9, 10, 11);
         List<String> colors = List.of("acorn", "bell", "heart", "leaf");
@@ -48,7 +48,7 @@ public class CardService {
         System.out.println("✅ All 32 cards inserted.");
     }
 
-    public List<Integer> getShuffledCardIds() {
+    private List<Integer> getShuffledCardIds() {
         List<Integer> cardIds = IntStream.rangeClosed(1, 32)
                 .boxed()
                 .collect(Collectors.toList());
@@ -70,5 +70,4 @@ public class CardService {
         }
         return cards;
     }
-
 }
