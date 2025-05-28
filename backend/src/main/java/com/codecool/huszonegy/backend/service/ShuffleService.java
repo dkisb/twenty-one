@@ -1,6 +1,6 @@
 package com.codecool.huszonegy.backend.service;
 
-import com.codecool.huszonegy.backend.model.User;
+import com.codecool.huszonegy.backend.model.Card;
 import com.codecool.huszonegy.backend.repository.ShuffleDao;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +25,9 @@ public class ShuffleService {
 
             shuffleDao.insertShuffledCard(cardId, userId, order);
         }
+    }
+
+    public Card getNextCardFromDeck(int userId, int order){
+        return shuffleDao.getNextCardInLine(order, userId);
     }
 }
