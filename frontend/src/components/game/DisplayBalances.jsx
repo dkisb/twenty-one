@@ -14,7 +14,6 @@ function DisplayBalances({ dealerMax, playerMax, currentTotal, currentUser }) {
           <strong>Total: {currentTotal}$</strong>
         </p>
       </div>
-
       <div className="players-balance">
         <img src="/chips.png" width="125" alt="Player poker chips" />
         <p>
