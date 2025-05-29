@@ -1,5 +1,3 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
 function EndGameControls({
@@ -40,19 +38,5 @@ function EndGameControls({
     </div>
   );
 }
-
-EndGameControls.propTypes = {
-  userData: PropTypes.shape({
-    Games: PropTypes.number.isRequired,
-    Win: PropTypes.number.isRequired,
-    Loss: PropTypes.number.isRequired,
-  }).isRequired,
-  outcomeMessage: PropTypes.string.isRequired,
-  winner: PropTypes.string.isRequired,
-  playerBalance: PropTypes.number.isRequired,
-  dealerBalance: PropTypes.number.isRequired,
-  handleNewGame: PropTypes.func.isRequired,
-  handleQuit: PropTypes.func.isRequired,
-};
 
 export default EndGameControls;

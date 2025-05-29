@@ -1,38 +1,54 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import GamePage from '../GamePage/GamePage';
 import StartScreen from './StartScreen';
-import startStore from '../../../stores/startStore';
 
 function StartPage({ onLoggedIn, onSuccessfulRegister, onActiveUser }) {
   const location = useLocation();
-  const { gameStarted, startGame, getCardIds, getUserData, setUser, setDealerBalance } = startStore();
+  const [gameStarted, setGameStarted] = useState(false);
+  const [card, setCard] = useState(null); // preserved in case needed later
+  const [randomCardIds, setRandomCardIds] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [dealerBalance, setDealerBalance] = useState(100);
 
   useEffect(() => {
     const loggedInUser = location.state;
     if (loggedInUser) {
-      setUser(loggedInUser);
+      setUserData(loggedInUser);
       setDealerBalance(loggedInUser.dealerBalance ?? 100);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state]);
 
   const handleStartGame = async () => {
-    await startGame(); // fetches and sets shuffled card IDs + first card
+    try {
+      const response = await fetch('/api/cards');
+      const cardIds = await response.json();
+      setRandomCardIds(cardIds);
+
+      const cardId = cardIds[0];
+      const response2 = await fetch(`/api/cards/${cardId}`);
+      const cardData = await response2.json();
+      setCard(cardData);
+
+      setGameStarted(true);
+    } catch (error) {
+      console.error('Error starting game:', error);
+    }
   };
 
-  return gameStarted && getCardIds() ? (
+  return gameStarted && randomCardIds ? (
     <GamePage
-      randomCards={getCardIds()}
+      randomCards={randomCardIds}
       gameStarted={gameStarted}
-      user={getUserData()}
-      dealerMoney={startStore.getState().getDealerBalance()}
+      user={userData}
+      onUser={setUserData}
+      dealerMoney={dealerBalance}
       onLoggedIn={onLoggedIn}
       onSuccessfulRegister={onSuccessfulRegister}
       onActiveUser={onActiveUser}
     />
   ) : (
-    <StartScreen userData={getUserData()} onStart={handleStartGame} />
+    <StartScreen userData={userData} onStart={handleStartGame} />
   );
 }
 
