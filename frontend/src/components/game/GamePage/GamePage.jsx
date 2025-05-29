@@ -10,8 +10,8 @@ function GamePage({
   onSuccessfulRegister,
   onActiveUser,
 }) {
-  const [yourHand, setYourHand] = useState([]);
-  const [dealerHand, setDealerHand] = useState([]);
+  const [yourHandLength, setYourHandLength] = useState(0);
+  const [dealerHandLength, setDealerHandLength] = useState(0);
   const [upperCardData, setUpperCardData] = useState(null);
   const [yourHandData, setYourHandData] = useState([]);
   const [dealerHandData, setDealerHandData] = useState([]);
@@ -35,6 +35,7 @@ function GamePage({
     setBetSubmitClicked(false);
     setNextCardInOrder(nextCardInOrder + 1);
     onNumberOfCards(numberOfCards - 1);
+    setYourHandLength(yourHandLength + 1);
   }
 
   async function handleAiMore() {
@@ -44,6 +45,7 @@ function GamePage({
     setDealerHandData([...dealerHandData, cardData]);
     setNextCardInOrder(nextCardInOrder + 1);
     onNumberOfCards(numberOfCards - 1);
+    setDealerHandLength(dealerHandLength + 1);
   }
 
   async function handleStop() {
@@ -77,8 +79,8 @@ function GamePage({
         onSetYourValue={setYourHandValue}
         onSetDealerValue={setDealerHandValue}
         upperCard={upperCardData}
-        yourHand={yourHand}
-        dealerHand={dealerHand}
+        yourHandLength={yourHandLength}
+        dealerHandLength={dealerHandLength}
         yourHandData={yourHandData}
         dealerHandData={dealerHandData}
         onSetWinner={setWinner}
