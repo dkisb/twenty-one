@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
-import DisplayBalances from "../DisplayBalances.jsx";
 import Cards from '../Cards/Cards.jsx';
-import DisplayButtons from '../DisplayButtons.jsx';
-
-function GamePage({ numberOfCards, onNumberOfCards, gameStarted, user, dealerMoney, onLoggedIn, onSuccessfulRegister, onActiveUser }) {
+function GamePage({
+  numberOfCards,
+  onNumberOfCards,
+  gameStarted,
+  user,
+  dealerMoney,
+  onLoggedIn,
+  onSuccessfulRegister,
+  onActiveUser,
+}) {
   const [yourHand, setYourHand] = useState([]);
   const [dealerHand, setDealerHand] = useState([]);
   const [upperCardData, setUpperCardData] = useState(null);
@@ -22,9 +28,6 @@ function GamePage({ numberOfCards, onNumberOfCards, gameStarted, user, dealerMon
   const [nextCardInOrder, setNextCardInOrder] = useState(1);
 
   async function handleMore() {
-/*    setYourHand([...yourHand, randomCardIds[0]]);
-    const nextCardId = randomCardIds[1];
-    setRandomCardIds((prev) => prev.slice(1));*/
     const response = await fetch(`/api/shuffle/getnext/1?order=${nextCardInOrder}`);
     const cardData = await response.json();
     setUpperCardData(cardData);
@@ -35,9 +38,6 @@ function GamePage({ numberOfCards, onNumberOfCards, gameStarted, user, dealerMon
   }
 
   async function handleAiMore() {
-/*    setDealerHand([...dealerHand, randomCardIds[0]]);
-    const nextCardId = randomCardIds[1];
-    setRandomCardIds((prev) => prev.slice(1));*/
     const response = await fetch(`/api/shuffle/getnext/1?order=${nextCardInOrder}`);
     const cardData = await response.json();
     setUpperCardData(cardData);
@@ -48,10 +48,6 @@ function GamePage({ numberOfCards, onNumberOfCards, gameStarted, user, dealerMon
 
   async function handleStop() {
     setStopClicked(true);
-/*    setDealerHand([...dealerHand, randomCardIds[0]]);
-    const nextCardId = randomCardIds[1];
-    setRandomCardIds((prev) => prev.slice(1));*/
-
     const response = await fetch(`/api/shuffle/getnext/1?order=${nextCardInOrder}`);
     const cardData = await response.json();
     setUpperCardData(cardData);
@@ -72,8 +68,6 @@ function GamePage({ numberOfCards, onNumberOfCards, gameStarted, user, dealerMon
 
   return (
     <div className="game-page">
-      <DisplayBalances dealerMax={dealerBalance} playerMax={playerBalance} currentTotal={totalBet} currentUser={user} />
-
       <Cards
         yourHandValue={yourHandValue}
         numberOfCards={numberOfCards}
@@ -102,24 +96,14 @@ function GamePage({ numberOfCards, onNumberOfCards, gameStarted, user, dealerMon
         onLoggedIn={onLoggedIn}
         onSuccessfulRegister={onSuccessfulRegister}
         onActiveUser={onActiveUser}
-      />
-
-      <DisplayButtons
-        dealerHandValue={dealerHandValue}
-        dealerHand={dealerHand}
-        stopClicked={stopClicked}
-        enoughClicked={enoughClicked}
-        onSetEnoughClicked={setEnoughClicked}
-        yourHandValue={yourHandValue}
-        onHandleStop={handleStop}
         onHandleMore={handleMore}
         onHandleAiMore={handleAiMore}
-        dealerMax={dealerBalance}
-        playerMax={playerBalance}
-        currentTotal={totalBet}
+        onHandleStop={handleStop}
+        onSetEnoughClicked={setEnoughClicked}
         onBet={setTotalBet}
         onSetDealer={setDealerBalance}
         onSetPlayer={setPlayerBalance}
+        currentTotal={totalBet}
         betSubmitClicked={betSubmitClicked}
         onSubmitClicked={setBetSubmitClicked}
       />

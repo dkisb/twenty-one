@@ -54,12 +54,16 @@ function DisplayButtons({
   };
 
   return (
-    <div className="display-buttons">
-      <div className="game-focused-buttons">
+    <div className="bg-white bg-opacity-20 backdrop-blur-lg p-4 rounded-3xl shadow-xl flex flex-col gap-4 items-center min-w-[16rem]">
+      <div className="flex flex-col gap-3 w-full items-center">
         {!stopClicked && yourHandValue < 20 && (
           <>
-            <button onClick={onHandleMore}>More</button>
-            <button onClick={handleRaiseBetClick}>Raise Bet</button>
+            <button onClick={onHandleMore} className="btn btn-primary w-full text-xl font-semibold">
+              🔁 More
+            </button>
+            <button onClick={handleRaiseBetClick} className="btn btn-warning w-full text-xl font-semibold">
+              💰 Raise Bet
+            </button>
           </>
         )}
 
@@ -67,11 +71,15 @@ function DisplayButtons({
           yourHandValue >= 15 &&
           yourHandValue < 22 &&
           !(yourHandValue === 22 && yourHand?.length === 2) &&
-          !betSubmitClicked && <button onClick={onHandleStop}>Enough</button>}
+          !betSubmitClicked && (
+            <button onClick={onHandleStop} className="btn btn-error w-full text-xl font-semibold">
+              ✋ Enough
+            </button>
+          )}
       </div>
 
       {showBetInput && (
-        <form onSubmit={handlePlaceBet} className="bet-input">
+        <form onSubmit={handlePlaceBet} className="flex flex-col gap-2 items-center mt-2 w-full">
           <input
             type="number"
             placeholder="Enter your bet"
@@ -79,27 +87,30 @@ function DisplayButtons({
             onChange={handleChange}
             max={playerMax}
             min="1"
+            className="input input-bordered w-full text-black"
           />
-          <button type="submit">Place Bet</button>
+          <button type="submit" className="btn btn-success w-full font-bold">
+            ✅ Place Bet
+          </button>
         </form>
       )}
 
-      <div className="help-button">
-        <button onClick={handleHelpClick}>How to Play</button>
-      </div>
+      <button onClick={handleHelpClick} className="btn btn-accent w-full text-lg font-medium mt-2">
+        ❓ How to Play
+      </button>
 
       {stopClicked && dealerHandValue < 15 && (
-        <div className="ai-more-button">
-          <button onClick={onHandleAiMore}>More</button>
-        </div>
+        <button onClick={onHandleAiMore} className="btn btn-info w-full mt-2">
+          🤖 Dealer More
+        </button>
       )}
 
       {stopClicked &&
         ((dealerHandValue >= 15 && dealerHandValue <= 21) || (dealerHandValue === 22 && dealerHand?.length === 2)) &&
         !enoughClicked && (
-          <div className="ai-enough-button">
-            <button onClick={() => onSetEnoughClicked(true)}>Enough</button>
-          </div>
+          <button onClick={() => onSetEnoughClicked(true)} className="btn btn-error w-full mt-2">
+            🛑 Dealer Enough
+          </button>
         )}
     </div>
   );
