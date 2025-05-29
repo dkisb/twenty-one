@@ -5,7 +5,8 @@ function DisplayButtons({
   onHandleAiMore,
   yourHandValue,
   dealerHandValue,
-  dealerHand,
+  yourHandLength,
+  dealerHandLength,
   onHandleStop,
   stopClicked,
   enoughClicked,
@@ -70,7 +71,7 @@ function DisplayButtons({
         {!stopClicked &&
           yourHandValue >= 15 &&
           yourHandValue < 22 &&
-          !(yourHandValue === 22 && yourHand?.length === 2) &&
+          !(yourHandValue === 22 && yourHandLength === 2) &&
           !betSubmitClicked && (
             <button onClick={onHandleStop} className="btn btn-error w-full text-xl font-semibold">
               ✋ Enough
@@ -106,7 +107,7 @@ function DisplayButtons({
       )}
 
       {stopClicked &&
-        ((dealerHandValue >= 15 && dealerHandValue <= 21) || (dealerHandValue === 22 && dealerHand?.length === 2)) &&
+        ((dealerHandValue >= 15 && dealerHandValue <= 21) || (dealerHandValue === 22 && dealerHandLength === 2)) &&
         !enoughClicked && (
           <button onClick={() => onSetEnoughClicked(true)} className="btn btn-error w-full mt-2">
             🛑 Dealer Enough

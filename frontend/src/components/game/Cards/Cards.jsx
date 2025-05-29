@@ -10,8 +10,8 @@ function Cards({
   playerBalance,
   dealerBalance,
   numberOfCards,
-  yourHand,
-  dealerHand,
+  yourHandLength,
+  dealerHandLength,
   upperCard,
   yourHandData,
   dealerHandData,
@@ -53,11 +53,11 @@ function Cards({
   }, [upperCard]);
 
   useEffect(() => {
-    if (dealerHandValue >= 22 && dealerHand.length > 2) {
+    if (dealerHandValue >= 22 && dealerHandLength > 2) {
       onSetWinner('player');
       setGameOver(true);
       setOutcomeMessage('Congratulation, you won!');
-    } else if (enoughClicked && dealerHandValue === 22 && dealerHand.length === 2) {
+    } else if (enoughClicked && dealerHandValue === 22 && dealerHandLength === 2) {
       onSetWinner('dealer');
       setGameOver(true);
       setOutcomeMessage('FIRE! Sorry, you lost!');
@@ -69,21 +69,21 @@ function Cards({
       onSetWinner('player');
       setGameOver(true);
       setOutcomeMessage('Congratulation, you won!');
-    } else if (yourHandValue >= 22 && yourHand.length > 2) {
+    } else if (yourHandValue >= 22 && yourHandLength > 2) {
       onSetWinner('dealer');
       setGameOver(true);
       setOutcomeMessage('Sorry, you lost!');
-    } else if (yourHandValue === 22 && yourHand.length === 2) {
+    } else if (yourHandValue === 22 && yourHandLength === 2) {
       onSetWinner('player');
       setGameOver(true);
       setOutcomeMessage('FIRE! Congratulation, you won!');
     }
   }, [
     dealerHandValue,
-    dealerHand.length,
+    dealerHandLength,
     enoughClicked,
     yourHandValue,
-    yourHand.length,
+    yourHandLength,
     onSetWinner,
     setGameOver,
     onGameOver,
@@ -143,7 +143,7 @@ function Cards({
             <DealerHand
               dealerHandData={dealerHandData}
               dealerHandValue={dealerHandValue}
-              dealerHand={dealerHand}
+              dealerHandLength={dealerHandLength}
               enoughClicked={enoughClicked}
               gameOver={onGameOver}
             />
@@ -166,7 +166,8 @@ function Cards({
               onHandleAiMore={onHandleAiMore}
               yourHandValue={yourHandValue}
               dealerHandValue={dealerHandValue}
-              dealerHand={dealerHand}
+              yourHandLength={yourHandLength}
+              dealerHandLength={dealerHandLength}
               onHandleStop={onHandleStop}
               stopClicked={stopClicked}
               enoughClicked={enoughClicked}
