@@ -2,7 +2,7 @@ function CardStack({ numberOfCards }) {
   return (
     <div className="card-stack" aria-label={`Card stack with ${numberOfCards || 0} cards remaining`}>
       <img
-        src="http://localhost:3000/Back.jpg"
+        src="Back.jpg"
         alt={`Card stack with ${numberOfCards || 0} cards remaining`}
         className="card-stack-image"
       />

@@ -8,8 +8,9 @@ function StartPage({ onLoggedIn, onSuccessfulRegister, onActiveUser }) {
   const [gameStarted, setGameStarted] = useState(false);
   const [card, setCard] = useState(null); // preserved in case needed later
   const [randomCardIds, setRandomCardIds] = useState(null);
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState({_id: 1, Username: 'demo', Games: 0, Win: 0, Loss: 0});
   const [dealerBalance, setDealerBalance] = useState(100);
+  const [numberOfCards, setNumberOfCards] = useState(32);
 
   useEffect(() => {
     const loggedInUser = location.state;
@@ -21,14 +22,14 @@ function StartPage({ onLoggedIn, onSuccessfulRegister, onActiveUser }) {
 
   const handleStartGame = async () => {
     try {
-      const response = await fetch('/api/cards');
+/*      const response = await fetch('/api/cards');
       const cardIds = await response.json();
       setRandomCardIds(cardIds);
 
       const cardId = cardIds[0];
       const response2 = await fetch(`/api/cards/${cardId}`);
       const cardData = await response2.json();
-      setCard(cardData);
+      setCard(cardData);*/
 
       setGameStarted(true);
     } catch (error) {
@@ -36,9 +37,10 @@ function StartPage({ onLoggedIn, onSuccessfulRegister, onActiveUser }) {
     }
   };
 
-  return gameStarted && randomCardIds ? (
+  return gameStarted ? (
     <GamePage
-      randomCards={randomCardIds}
+      numberOfCards={numberOfCards}
+      onNumberOfCards={setNumberOfCards}
       gameStarted={gameStarted}
       user={userData}
       onUser={setUserData}

@@ -33,11 +33,8 @@ public class CardService {
 
                 String number = String.format("%02d", cardNumber);
                 String filename = number + color + "-" + name + ".png";
-                Path frontPath = Path.of("images", filename);
 
-                byte[] frontImage = Files.readAllBytes(frontPath);
-
-                Card card = new Card(name, color, value, frontImage);
+                Card card = new Card(name, color, value, filename);
                 cardDao.addCard(card);
 
                 cardNumber++;
