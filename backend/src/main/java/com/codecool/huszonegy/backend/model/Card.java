@@ -12,13 +12,13 @@ public class Card {
     private String name;
     private String color;
     private int value;
-    private byte[] frontImageData;
+    private String frontImagePath;
 
-    public Card(String name, String color, int value, byte[] frontImageData) {
+    public Card(String name, String color, int value, String frontImageData) {
         this.name = name;
         this.color = color;
         this.value = value;
-        this.frontImageData = frontImageData;
+        this.frontImagePath = frontImageData;
     }
 }
 

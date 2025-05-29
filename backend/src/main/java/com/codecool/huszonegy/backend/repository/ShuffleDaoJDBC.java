@@ -40,7 +40,7 @@ public class ShuffleDaoJDBC implements ShuffleDao {
     @Override
     public Card getNextCardInLine(int order, int userId) {
         String sql = """
-        SELECT c.id, c.name, c.color, c.value, c.front_image
+        SELECT c.id, c.name, c.color, c.value, c.front_image_path
         FROM shuffles s
         JOIN cards c ON s.card_id = c.id
         WHERE s.user_id = ? AND s.card_order = ?
@@ -59,7 +59,7 @@ public class ShuffleDaoJDBC implements ShuffleDao {
                         rs.getString("name"),
                         rs.getString("color"),
                         rs.getInt("value"),
-                        rs.getBytes("front_image")
+                        rs.getString("front_image_path")
                 );
                 card.setId(rs.getInt("id"));
                 return card;

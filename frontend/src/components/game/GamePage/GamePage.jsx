@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import DisplayBalances from '../utils/displaybalances';
+import DisplayBalances from "../DisplayBalances.jsx";
 import Cards from '../Cards/Cards.jsx';
 import DisplayButtons from '../DisplayButtons.jsx';
 
-function GamePage({ randomCards, gameStarted, user, dealerMoney, onLoggedIn, onSuccessfulRegister, onActiveUser }) {
+function GamePage({ numberOfCards, onNumberOfCards, gameStarted, user, dealerMoney, onLoggedIn, onSuccessfulRegister, onActiveUser }) {
   const [yourHand, setYourHand] = useState([]);
   const [dealerHand, setDealerHand] = useState([]);
-  const [randomCardIds, setRandomCardIds] = useState(randomCards);
   const [upperCardData, setUpperCardData] = useState(null);
   const [yourHandData, setYourHandData] = useState([]);
   const [dealerHandData, setDealerHandData] = useState([]);
@@ -20,47 +19,45 @@ function GamePage({ randomCards, gameStarted, user, dealerMoney, onLoggedIn, onS
   const [winner, setWinner] = useState('');
   const [isGameOver, setIsGameOver] = useState(false);
   const [betSubmitClicked, setBetSubmitClicked] = useState(false);
+  const [nextCardInOrder, setNextCardInOrder] = useState(1);
 
   async function handleMore() {
-    setYourHand([...yourHand, randomCardIds[0]]);
+/*    setYourHand([...yourHand, randomCardIds[0]]);
     const nextCardId = randomCardIds[1];
-    setRandomCardIds((prev) => prev.slice(1));
-
-    if (nextCardId) {
-      const response = await fetch(`/api/cards/${nextCardId}`);
-      const cardData = await response.json();
-      setUpperCardData(cardData);
-      setYourHandData([...yourHandData, cardData]);
-    }
-
+    setRandomCardIds((prev) => prev.slice(1));*/
+    const response = await fetch(`/api/shuffle/getnext/1?order=${nextCardInOrder}`);
+    const cardData = await response.json();
+    setUpperCardData(cardData);
+    setYourHandData([...yourHandData, cardData]);
     setBetSubmitClicked(false);
+    setNextCardInOrder(nextCardInOrder + 1);
+    onNumberOfCards(numberOfCards - 1);
   }
 
   async function handleAiMore() {
-    setDealerHand([...dealerHand, randomCardIds[0]]);
+/*    setDealerHand([...dealerHand, randomCardIds[0]]);
     const nextCardId = randomCardIds[1];
-    setRandomCardIds((prev) => prev.slice(1));
-
-    if (nextCardId) {
-      const response = await fetch(`/api/cards/${nextCardId}`);
-      const cardData = await response.json();
-      setUpperCardData(cardData);
-      setDealerHandData([...dealerHandData, cardData]);
-    }
+    setRandomCardIds((prev) => prev.slice(1));*/
+    const response = await fetch(`/api/shuffle/getnext/1?order=${nextCardInOrder}`);
+    const cardData = await response.json();
+    setUpperCardData(cardData);
+    setDealerHandData([...dealerHandData, cardData]);
+    setNextCardInOrder(nextCardInOrder + 1);
+    onNumberOfCards(numberOfCards - 1);
   }
 
   async function handleStop() {
     setStopClicked(true);
-    setDealerHand([...dealerHand, randomCardIds[0]]);
+/*    setDealerHand([...dealerHand, randomCardIds[0]]);
     const nextCardId = randomCardIds[1];
-    setRandomCardIds((prev) => prev.slice(1));
+    setRandomCardIds((prev) => prev.slice(1));*/
 
-    if (nextCardId) {
-      const response = await fetch(`/api/cards/${nextCardId}`);
-      const cardData = await response.json();
-      setUpperCardData(cardData);
-      setDealerHandData([...dealerHandData, cardData]);
-    }
+    const response = await fetch(`/api/shuffle/getnext/1?order=${nextCardInOrder}`);
+    const cardData = await response.json();
+    setUpperCardData(cardData);
+    setDealerHandData([...dealerHandData, cardData]);
+    setNextCardInOrder(nextCardInOrder + 1);
+    onNumberOfCards(numberOfCards - 1);
   }
 
   useEffect(() => {
@@ -79,14 +76,13 @@ function GamePage({ randomCards, gameStarted, user, dealerMoney, onLoggedIn, onS
 
       <Cards
         yourHandValue={yourHandValue}
+        numberOfCards={numberOfCards}
         dealerHandValue={dealerHandValue}
         stopClicked={stopClicked}
         enoughClicked={enoughClicked}
         onSetYourValue={setYourHandValue}
         onSetDealerValue={setDealerHandValue}
-        card={randomCardIds[0]}
         upperCard={upperCardData}
-        numberOfCards={randomCardIds.length}
         yourHand={yourHand}
         dealerHand={dealerHand}
         yourHandData={yourHandData}
