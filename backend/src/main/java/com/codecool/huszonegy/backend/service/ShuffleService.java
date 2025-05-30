@@ -17,6 +17,7 @@ public class ShuffleService {
     }
 
     public void addShuffledDeck(int userId) {
+        shuffleDao.truncateTable();
         List<Integer> shuffledCardIds = cardService.getShuffledCardIds();
 
         for(int i = 0; i < shuffledCardIds.size(); i++) {

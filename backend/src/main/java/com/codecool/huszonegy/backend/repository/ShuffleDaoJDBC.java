@@ -7,10 +7,7 @@ import com.codecool.huszonegy.backend.service.CardService;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Base64;
 
 @Repository
@@ -34,6 +31,20 @@ public class ShuffleDaoJDBC implements ShuffleDao {
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+    @Override
+    public void truncateTable() {
+        String sql = "TRUNCATE TABLE shuffles;";
+
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement()) {
+
+            stmt.execute(sql);
+            System.out.println("Table shuffles truncated successfully.");
+
+        } catch (SQLException e) {
+            System.err.println("Error truncating table: " + e.getMessage());
         }
     }
 

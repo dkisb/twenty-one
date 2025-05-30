@@ -23,7 +23,7 @@ public class ShuffleController {
     }
 
     @GetMapping("/getnext/{userId}")
-        public Card getNextCardFromDeck(@PathVariable int userId,@RequestParam int order){
-            return shuffleService.getNextCardFromDeck(userId, order);
+    public Card getNextCardFromDeck(@PathVariable int userId,@RequestParam int order){
+        return shuffleService.getNextCardFromDeck(userId, order);
         }
 }
