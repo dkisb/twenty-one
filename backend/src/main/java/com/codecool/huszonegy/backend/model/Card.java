@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import java.util.Base64;
 
+
 @Getter
 @Setter
 public class Card {
