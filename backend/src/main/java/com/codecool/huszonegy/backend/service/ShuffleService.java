@@ -1,7 +1,7 @@
 package com.codecool.huszonegy.backend.service;
 
 import com.codecool.huszonegy.backend.model.Card;
-import com.codecool.huszonegy.backend.repository.ShuffleDao;
+import com.codecool.huszonegy.backend.repository.ShuffleRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,11 +9,11 @@ import java.util.List;
 @Service
 public class ShuffleService {
     private final CardService cardService;
-    private final ShuffleDao shuffleDao;
+    private final ShuffleRepository shuffleRepository;
 
-    public ShuffleService(CardService cardService, ShuffleDao shuffleDao) {
+    public ShuffleService(CardService cardService, ShuffleRepository shuffleRepository) {
         this.cardService = cardService;
-        this.shuffleDao = shuffleDao;
+        this.shuffleRepository = shuffleRepository;
     }
 
     public void addShuffledDeck(int userId) {
@@ -23,11 +23,11 @@ public class ShuffleService {
             int cardId = shuffledCardIds.get(i);
             int order = i + 1;
 
-            shuffleDao.insertShuffledCard(cardId, userId, order);
+            shuffleRepository.insertShuffledCard(cardId, userId, order);
         }
     }
 
     public Card getNextCardFromDeck(int userId, int order){
-        return shuffleDao.getNextCardInLine(order, userId);
+        return shuffleRepository.findCardByUserIdAndCardOrder(userId, order).orElseThrow(() -> new RuntimeException("Card not found"));
     }
 }

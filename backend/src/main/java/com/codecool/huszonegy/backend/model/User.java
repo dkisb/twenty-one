@@ -1,28 +1,25 @@
 package com.codecool.huszonegy.backend.model;
 
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+@Entity
 @Getter
 @Setter
+@Table(name = "users")
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String username;
     private String password;
     private String email;
-    private int playedGames;
-    private int wonGames;
-    private int lostGames;
-    private int creditBalance;
+    private int playedGames = 0;
+    private int wonGames = 0;
+    private int lostGames = 0;
+    private int creditBalance = 0;
 
-    public User (String username, String password, String email) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.playedGames = 0;
-        this.wonGames = 0;
-        this.lostGames = 0;
-        this.creditBalance = 0;
-    }
 }
