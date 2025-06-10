@@ -8,5 +8,4 @@ import java.util.Optional;
 public interface CardDao {
 
     void addCard(Card card);
-    Optional<Card> findCardById(int id) throws SQLException;
 }

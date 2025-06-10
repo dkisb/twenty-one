@@ -4,10 +4,8 @@ import com.codecool.huszonegy.backend.model.Card;
 import com.codecool.huszonegy.backend.repository.CardDao;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.sql.SQLException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 

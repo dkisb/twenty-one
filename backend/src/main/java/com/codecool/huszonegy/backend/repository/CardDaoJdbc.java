@@ -32,28 +32,4 @@ public class CardDaoJdbc implements CardDao {
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public Optional<Card> findCardById(int id) throws SQLException {
-        String sql = "SELECT * FROM cards WHERE id = ?";
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                Card card = new Card(
-                        rs.getString("name"),
-                        rs.getString("color"),
-                        rs.getInt("value"),
-                        rs.getString("front_image_path")
-                );
-                card.setId(rs.getInt("id"));
-                return Optional.of(card);
-            }
-            return Optional.empty();
-        }
-    }
 }
