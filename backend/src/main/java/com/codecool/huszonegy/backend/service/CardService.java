@@ -1,12 +1,9 @@
 package com.codecool.huszonegy.backend.service;
 
 import com.codecool.huszonegy.backend.model.Card;
-import com.codecool.huszonegy.backend.repository.CardDao;
+import com.codecool.huszonegy.backend.repository.CardRepository;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -14,10 +11,10 @@ import java.util.stream.IntStream;
 @Service
 public class CardService {
 
-    private final CardDao cardDao;
+    private final CardRepository cardRepository;
 
-    public CardService(CardDao cardDao) {
-        this.cardDao = cardDao;
+    public CardService( CardRepository cardRepository) {
+        this.cardRepository = cardRepository;
     }
 
     public void generateAllCards() throws Exception {
@@ -34,8 +31,12 @@ public class CardService {
                 String number = String.format("%02d", cardNumber);
                 String filename = number + color + "-" + name + ".png";
 
-                Card card = new Card(name, color, value, filename);
-                cardDao.addCard(card);
+                Card card = new Card();
+                card.setName(name);
+                card.setValue(value);
+                card.setColor(color);
+                card.setFrontImagePath(filename);
+                cardRepository.save(card);
 
                 cardNumber++;
             }

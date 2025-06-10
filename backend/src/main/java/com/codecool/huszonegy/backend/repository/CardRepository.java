@@ -7,6 +7,4 @@ import java.util.Optional;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
     Optional<Card> findCardById(int id);
-    void createCard(Card card);
-    void deleteCardById(int id);
 }
