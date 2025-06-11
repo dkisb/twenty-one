@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PlayerHand from './PlayerHand';
 import DealerHand from './DealerHand';
 import CardStack from './CardStack';
-import EndGameControls from './EndGameControls';
 import DisplayBalances from '../DisplayBalances';
 import DisplayButtons from '../DisplayButtons';
 
@@ -12,15 +12,12 @@ function Cards({
   numberOfCards,
   yourHandLength,
   dealerHandLength,
-  upperCard,
   yourHandData,
   dealerHandData,
-  onSetYourValue,
   yourHandValue,
   dealerHandValue,
-  onSetDealerValue,
   stopClicked,
-  enoughClicked,
+  enoughReached,
   onSetWinner,
   setGameOver,
   onGameOver,
@@ -31,9 +28,7 @@ function Cards({
   onSuccessfulRegister,
   onActiveUser,
   onHandleMore,
-  onHandleAiMore,
   onHandleStop,
-  onSetEnoughClicked,
   onBet,
   onSetDealer,
   onSetPlayer,
@@ -43,29 +38,22 @@ function Cards({
 }) {
   const [outcomeMessage, setOutcomeMessage] = useState('');
   const [userData, setUserData] = useState(user);
-
-  useEffect(() => {
-    if (upperCard && !stopClicked) {
-      onSetYourValue(yourHandValue + upperCard.value);
-    } else if (upperCard && stopClicked) {
-      onSetDealerValue(dealerHandValue + upperCard.value);
-    }
-  }, [upperCard]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (dealerHandValue >= 22 && dealerHandLength > 2) {
       onSetWinner('player');
       setGameOver(true);
       setOutcomeMessage('Congratulation, you won!');
-    } else if (enoughClicked && dealerHandValue === 22 && dealerHandLength === 2) {
+    } else if (enoughReached && dealerHandValue === 22 && dealerHandLength === 2) {
       onSetWinner('dealer');
       setGameOver(true);
       setOutcomeMessage('FIRE! Sorry, you lost!');
-    } else if (enoughClicked && dealerHandValue >= yourHandValue && dealerHandValue < 22) {
+    } else if (enoughReached && dealerHandValue >= yourHandValue && dealerHandValue < 22) {
       onSetWinner('dealer');
       setGameOver(true);
       setOutcomeMessage('Sorry, you lost!');
-    } else if (enoughClicked && dealerHandValue < yourHandValue) {
+    } else if (enoughReached && dealerHandValue < yourHandValue) {
       onSetWinner('player');
       setGameOver(true);
       setOutcomeMessage('Congratulation, you won!');
@@ -81,7 +69,7 @@ function Cards({
   }, [
     dealerHandValue,
     dealerHandLength,
-    enoughClicked,
+    enoughReached,
     yourHandValue,
     yourHandLength,
     onSetWinner,
@@ -100,20 +88,19 @@ function Cards({
 
   async function handleNewGame() {
     setGameOver(true);
-    gameStarted(false);
-    const updated = await patchUser(userData._id, {
-      Balance: playerBalance,
-      Games: userData.Games + 1,
-      ...(winner === 'player' ? { Win: userData.Win + 1 } : { Loss: userData.Loss + 1 }),
-    });
-    onLoggedIn(true);
-    onSuccessfulRegister(true);
-    onActiveUser(updated);
+    // const updated = await patchUser(userData._id, {
+    //   Balance: playerBalance,
+    //   Games: userData.Games + 1,
+    //   ...(winner === 'player' ? { Win: userData.Win + 1 } : { Loss: userData.Loss + 1 }),
+    // });
+    // onLoggedIn(true);
+    // onSuccessfulRegister(true);
+    // onActiveUser(updated);
+    navigate('/gamepage', { replace: true });
   }
 
   async function handleQuit() {
     setGameOver(true);
-    gameStarted(false);
     const updated = await patchUser(userData._id, {
       Balance: playerBalance,
       Games: userData.Games + 1,
@@ -144,7 +131,7 @@ function Cards({
               dealerHandData={dealerHandData}
               dealerHandValue={dealerHandValue}
               dealerHandLength={dealerHandLength}
-              enoughClicked={enoughClicked}
+              enoughReached={enoughReached}
               gameOver={onGameOver}
             />
           </div>
@@ -163,15 +150,13 @@ function Cards({
           <div className="absolute bottom-6 right-6">
             <DisplayButtons
               onHandleMore={onHandleMore}
-              onHandleAiMore={onHandleAiMore}
               yourHandValue={yourHandValue}
               dealerHandValue={dealerHandValue}
               yourHandLength={yourHandLength}
               dealerHandLength={dealerHandLength}
               onHandleStop={onHandleStop}
               stopClicked={stopClicked}
-              enoughClicked={enoughClicked}
-              onSetEnoughClicked={onSetEnoughClicked}
+              enoughReached={enoughReached}
               onBet={onBet}
               onSetDealer={onSetDealer}
               onSetPlayer={onSetPlayer}
