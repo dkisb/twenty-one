@@ -54,6 +54,7 @@ function GamePage({
     const cardData = await response.json();
     setUpperCardData(cardData);
     setDealerHandData([...dealerHandData, cardData]);
+    setDealerHandLength(dealerHandLength + 1)
     setNextCardInOrder(nextCardInOrder + 1);
     onNumberOfCards(numberOfCards - 1);
   }
