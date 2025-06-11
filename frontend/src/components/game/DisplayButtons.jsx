@@ -2,15 +2,13 @@ import { useState } from 'react';
 
 function DisplayButtons({
   onHandleMore,
-  onHandleAiMore,
   yourHandValue,
   dealerHandValue,
   yourHandLength,
   dealerHandLength,
   onHandleStop,
   stopClicked,
-  enoughClicked,
-  onSetEnoughClicked,
+  enoughReached,
   onBet,
   onSetDealer,
   onSetPlayer,
@@ -99,20 +97,6 @@ function DisplayButtons({
       <button onClick={handleHelpClick} className="btn btn-accent w-full text-lg font-medium mt-2">
         ❓ How to Play
       </button>
-
-      {stopClicked && dealerHandValue < 15 && (
-        <button onClick={onHandleAiMore} className="btn btn-info w-full mt-2">
-          🤖 Dealer More
-        </button>
-      )}
-
-      {stopClicked &&
-        ((dealerHandValue >= 15 && dealerHandValue <= 21) || (dealerHandValue === 22 && dealerHandLength === 2)) &&
-        !enoughClicked && (
-          <button onClick={() => onSetEnoughClicked(true)} className="btn btn-error w-full mt-2">
-            🛑 Dealer Enough
-          </button>
-        )}
     </div>
   );
 }

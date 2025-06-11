@@ -1,4 +1,5 @@
 import { StrictMode } from 'react';
+import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './index.css';
@@ -10,16 +11,22 @@ import GamePage from './components/game/GamePage/GamePage.jsx';
 import AccountPage from './components/account/AccountPage/AccountPage.jsx';
 import AccountUpdater from './components/account/AccountUpdater/AccountUpdater.jsx';
 
-const router = createBrowserRouter([
-  // { path: '/', element: <LoginPage /> },
-  { path: '/', element: <StartPage /> },
-  { path: '/gamepage', element: <GamePage /> },
-  // { path: '/account', element: <AccountPage /> },
-  // { path: '/update/:id', element: <AccountUpdater /> },
-]);
+export default function App() {
+  const [gameKey, setGameKey] = useState(0);
+
+  const router = createBrowserRouter([
+    { path: '/', element: <StartPage /> },
+    {
+      path: '/gamepage',
+      element: <GamePage key={gameKey} onNewGame={() => setGameKey((k) => k + 1)} />,
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
+}
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <App />
   </StrictMode>
 );

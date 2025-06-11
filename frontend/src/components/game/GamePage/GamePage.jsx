@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Cards from '../Cards/Cards.jsx';
+
 function GamePage({
   numberOfCards,
   onNumberOfCards,
@@ -18,7 +19,7 @@ function GamePage({
   const [yourHandValue, setYourHandValue] = useState(0);
   const [dealerHandValue, setDealerHandValue] = useState(0);
   const [stopClicked, setStopClicked] = useState(false);
-  const [enoughClicked, setEnoughClicked] = useState(false);
+  const [enoughReached, setEnoughReached] = useState(false);
   const [dealerBalance, setDealerBalance] = useState(dealerMoney ?? 100);
   const [playerBalance, setPlayerBalance] = useState(user?.Balance ?? 100);
   const [totalBet, setTotalBet] = useState(0);
@@ -26,6 +27,16 @@ function GamePage({
   const [isGameOver, setIsGameOver] = useState(false);
   const [betSubmitClicked, setBetSubmitClicked] = useState(false);
   const [nextCardInOrder, setNextCardInOrder] = useState(1);
+
+  useEffect(() => {
+    const handValue = dealerHandData.reduce((sum, card) => sum + card.value, 0);
+    setDealerHandValue(handValue);
+  }, [dealerHandData]);
+
+  useEffect(() => {
+    const handValue = yourHandData.reduce((sum, card) => sum + card.value, 0);
+    setYourHandValue(handValue);
+  }, [yourHandData]);
 
   async function handleMore() {
     const response = await fetch(`/api/shuffle/getnext/1?order=${nextCardInOrder}`);
@@ -38,25 +49,27 @@ function GamePage({
     setYourHandLength(yourHandLength + 1);
   }
 
-  async function handleAiMore() {
-    const response = await fetch(`/api/shuffle/getnext/1?order=${nextCardInOrder}`);
-    const cardData = await response.json();
-    setUpperCardData(cardData);
-    setDealerHandData([...dealerHandData, cardData]);
-    setNextCardInOrder(nextCardInOrder + 1);
-    onNumberOfCards(numberOfCards - 1);
-    setDealerHandLength(dealerHandLength + 1);
+  async function dealDealerCardsUntilThreshold(startingOrder, delay, threshold, initialHandValue) {
+    let currentOrder = startingOrder;
+    let currentHandValue = initialHandValue;
+
+    while (currentHandValue < threshold) {
+      const response = await fetch(`/api/shuffle/getnext/1?order=${currentOrder}`);
+      const cardData = await response.json();
+      setDealerHandData((prev) => [...prev, cardData]);
+      setDealerHandLength((prev) => prev + 1);
+      currentHandValue += cardData.value;
+      currentOrder++;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+    if (currentHandValue >= threshold) {
+      setEnoughReached(true);
+    }
   }
 
   async function handleStop() {
     setStopClicked(true);
-    const response = await fetch(`/api/shuffle/getnext/1?order=${nextCardInOrder}`);
-    const cardData = await response.json();
-    setUpperCardData(cardData);
-    setDealerHandData([...dealerHandData, cardData]);
-    setDealerHandLength(dealerHandLength + 1)
-    setNextCardInOrder(nextCardInOrder + 1);
-    onNumberOfCards(numberOfCards - 1);
+    await dealDealerCardsUntilThreshold(nextCardInOrder, 1000, 15, dealerHandValue);
   }
 
   useEffect(() => {
@@ -76,7 +89,7 @@ function GamePage({
         numberOfCards={numberOfCards}
         dealerHandValue={dealerHandValue}
         stopClicked={stopClicked}
-        enoughClicked={enoughClicked}
+        enoughReached={enoughReached}
         onSetYourValue={setYourHandValue}
         onSetDealerValue={setDealerHandValue}
         upperCard={upperCardData}
@@ -100,9 +113,7 @@ function GamePage({
         onSuccessfulRegister={onSuccessfulRegister}
         onActiveUser={onActiveUser}
         onHandleMore={handleMore}
-        onHandleAiMore={handleAiMore}
         onHandleStop={handleStop}
-        onSetEnoughClicked={setEnoughClicked}
         onBet={setTotalBet}
         onSetDealer={setDealerBalance}
         onSetPlayer={setPlayerBalance}
