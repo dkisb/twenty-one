@@ -19,30 +19,38 @@ function DisplayButtons({
   onSubmitClicked,
 }) {
   const [showBetInput, setShowBetInput] = useState(false);
-  const [betAmount, setBetAmount] = useState(0);
+  const [betAmount, setBetAmount] = useState(''); // Default to empty string
 
   const handleRaiseBetClick = () => {
     setShowBetInput(true);
+    setBetAmount(''); // Reset input to empty when opening bet input
   };
 
   const handleChange = (e) => {
-    const val = parseInt(e.target.value, 10);
-    if (!isNaN(val) && val <= playerMax) {
+    const val = e.target.value;
+    // allow empty input
+    if (val === '') {
+      setBetAmount('');
+      return;
+    }
+    const num = parseInt(val, 10);
+    if (!isNaN(num) && num <= playerMax) {
       setBetAmount(val);
-    } else if (val > playerMax) {
+    } else if (num > playerMax) {
       alert(`You cannot bet more than ${playerMax}$`);
     }
   };
 
   const handlePlaceBet = (e) => {
     e.preventDefault();
-    if (betAmount > 0) {
-      onBet(currentTotal + betAmount * 2);
-      onSetDealer(dealerMax - betAmount);
-      onSetPlayer(playerMax - betAmount);
+    const numBet = parseInt(betAmount, 10);
+    if (numBet > 0) {
+      onBet(currentTotal + numBet * 2);
+      onSetDealer(dealerMax - numBet);
+      onSetPlayer(playerMax - numBet);
       onSubmitClicked(true);
       setShowBetInput(false);
-      setBetAmount(0);
+      setBetAmount('');
     } else {
       alert('Enter a valid bet amount.');
     }
@@ -52,33 +60,45 @@ function DisplayButtons({
     window.open('https://hu.wikipedia.org/wiki/Huszonegyes', '_blank');
   };
 
-  return (
-    <div className="bg-white bg-opacity-20 backdrop-blur-lg p-4 rounded-3xl shadow-xl flex flex-col gap-4 items-center min-w-[16rem]">
-      <div className="flex flex-col gap-3 w-full items-center">
-        {!stopClicked && yourHandValue < 20 && (
-          <>
-            <button onClick={onHandleMore} className="btn btn-primary w-full text-xl font-semibold">
-              🔁 More
-            </button>
-            <button onClick={handleRaiseBetClick} className="btn btn-warning w-full text-xl font-semibold">
-              💰 Raise Bet
-            </button>
-          </>
-        )}
+  // Logic to hide/show buttons
+  const showMoreBtn = !stopClicked && yourHandValue < 20 && !showBetInput;
 
-        {!stopClicked &&
-          yourHandValue >= 15 &&
-          yourHandValue < 22 &&
-          !(yourHandValue === 22 && yourHandLength === 2) &&
-          !betSubmitClicked && (
-            <button onClick={onHandleStop} className="btn btn-error w-full text-xl font-semibold">
-              ✋ Enough
-            </button>
-          )}
+  const showRaiseBetBtn = !stopClicked && !showBetInput && !betSubmitClicked && yourHandValue < 20;
+
+  const showEnoughBtn =
+    !stopClicked &&
+    yourHandValue >= 15 &&
+    yourHandValue < 22 &&
+    !(yourHandValue === 22 && yourHandLength === 2) &&
+    !showBetInput &&
+    !betSubmitClicked;
+
+  const showHelpBtn = !showBetInput;
+
+  return (
+    <div className="bg-white/20 backdrop-blur-lg p-3 rounded-2xl shadow-lg flex flex-col gap-3 items-center min-w-[12rem] max-w-xs w-full border border-white/10">
+      {/* Action Buttons */}
+      <div className="flex flex-col gap-2 w-full items-center">
+        {showMoreBtn && (
+          <button onClick={onHandleMore} className="btn btn-primary btn-sm w-full font-semibold tracking-wide">
+            🔁 More
+          </button>
+        )}
+        {showRaiseBetBtn && (
+          <button onClick={handleRaiseBetClick} className="btn btn-warning btn-sm w-full font-semibold tracking-wide">
+            💰 Raise Bet
+          </button>
+        )}
+        {showEnoughBtn && (
+          <button onClick={onHandleStop} className="btn btn-error btn-sm w-full font-semibold tracking-wide">
+            ✋ Enough
+          </button>
+        )}
       </div>
 
+      {/* Bet Input */}
       {showBetInput && (
-        <form onSubmit={handlePlaceBet} className="flex flex-col gap-2 items-center mt-2 w-full">
+        <form onSubmit={handlePlaceBet} className="flex flex-col gap-2 items-center w-full mt-2 animate-fade-in">
           <input
             type="number"
             placeholder="Enter your bet"
@@ -86,17 +106,21 @@ function DisplayButtons({
             onChange={handleChange}
             max={playerMax}
             min="1"
-            className="input input-bordered w-full text-black"
+            className="input input-bordered input-sm w-full text-black"
+            autoFocus
           />
-          <button type="submit" className="btn btn-success w-full font-bold">
+          <button type="submit" className="btn btn-success btn-sm w-full font-bold tracking-wide">
             ✅ Place Bet
           </button>
         </form>
       )}
 
-      <button onClick={handleHelpClick} className="btn btn-accent w-full text-lg font-medium mt-2">
-        ❓ How to Play
-      </button>
+      {/* Help Button */}
+      {showHelpBtn && (
+        <button onClick={handleHelpClick} className="btn btn-accent btn-xs w-full font-medium">
+          ❓ How to Play
+        </button>
+      )}
     </div>
   );
 }

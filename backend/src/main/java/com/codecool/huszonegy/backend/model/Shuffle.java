@@ -1,8 +1,12 @@
 package com.codecool.huszonegy.backend.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "shuffles")
 public class Shuffle {
     @Id
@@ -15,5 +19,13 @@ public class Shuffle {
     @ManyToOne
     @JoinColumn(name = "card_id")
     private Card card;
+
+    public Shuffle(Card card, int userId, int cardOrder) {
+        this.card = card;
+        this.userId = userId;
+        this.cardOrder = cardOrder;
+    }
+
+    public Shuffle() {}
 }
 
