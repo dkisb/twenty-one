@@ -6,31 +6,17 @@ import StartScreen from './StartScreen';
 function StartPage({ onLoggedIn, onSuccessfulRegister, onActiveUser }) {
   const location = useLocation();
   const [gameStarted, setGameStarted] = useState(false);
-  const [card, setCard] = useState(null); // preserved in case needed later
-  const [randomCardIds, setRandomCardIds] = useState(null);
-  const [userData, setUserData] = useState({_id: 1, Username: 'demo', Games: 0, Win: 0, Loss: 0});
-  const [dealerBalance, setDealerBalance] = useState(100);
-  const [numberOfCards, setNumberOfCards] = useState(32);
+  const [userData, setUserData] = useState({ _id: 1, Username: 'demo', Games: 0, Win: 0, Loss: 0 });
 
   useEffect(() => {
     const loggedInUser = location.state;
     if (loggedInUser) {
       setUserData(loggedInUser);
-      setDealerBalance(loggedInUser.dealerBalance ?? 100);
     }
   }, [location.state]);
 
   const handleStartGame = async () => {
     try {
-/*      const response = await fetch('/api/cards');
-      const cardIds = await response.json();
-      setRandomCardIds(cardIds);
-
-      const cardId = cardIds[0];
-      const response2 = await fetch(`/api/cards/${cardId}`);
-      const cardData = await response2.json();
-      setCard(cardData);*/
-
       setGameStarted(true);
     } catch (error) {
       console.error('Error starting game:', error);
@@ -39,12 +25,9 @@ function StartPage({ onLoggedIn, onSuccessfulRegister, onActiveUser }) {
 
   return gameStarted ? (
     <GamePage
-      numberOfCards={numberOfCards}
-      onNumberOfCards={setNumberOfCards}
       gameStarted={gameStarted}
       user={userData}
       onUser={setUserData}
-      dealerMoney={dealerBalance}
       onLoggedIn={onLoggedIn}
       onSuccessfulRegister={onSuccessfulRegister}
       onActiveUser={onActiveUser}

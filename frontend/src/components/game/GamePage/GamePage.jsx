@@ -1,16 +1,7 @@
 import { useState, useEffect } from 'react';
 import Cards from '../Cards/Cards.jsx';
 
-function GamePage({
-  numberOfCards,
-  onNumberOfCards,
-  gameStarted,
-  user,
-  dealerMoney,
-  onLoggedIn,
-  onSuccessfulRegister,
-  onActiveUser,
-}) {
+function GamePage({ gameStarted, user, onLoggedIn, onSuccessfulRegister, onActiveUser }) {
   const [yourHandLength, setYourHandLength] = useState(0);
   const [dealerHandLength, setDealerHandLength] = useState(0);
   const [upperCardData, setUpperCardData] = useState(null);
@@ -20,8 +11,9 @@ function GamePage({
   const [dealerHandValue, setDealerHandValue] = useState(0);
   const [stopClicked, setStopClicked] = useState(false);
   const [enoughReached, setEnoughReached] = useState(false);
-  const [dealerBalance, setDealerBalance] = useState(dealerMoney ?? 100);
+  const [dealerBalance, setDealerBalance] = useState(100);
   const [playerBalance, setPlayerBalance] = useState(user?.Balance ?? 100);
+  const [numberOfCards, setNumberOfCards] = useState(32);
   const [totalBet, setTotalBet] = useState(0);
   const [winner, setWinner] = useState('');
   const [isGameOver, setIsGameOver] = useState(false);
@@ -45,7 +37,7 @@ function GamePage({
     setYourHandData([...yourHandData, cardData]);
     setBetSubmitClicked(false);
     setNextCardInOrder(nextCardInOrder + 1);
-    onNumberOfCards(numberOfCards - 1);
+    setNumberOfCards(numberOfCards - 1);
     setYourHandLength(yourHandLength + 1);
   }
 
@@ -58,6 +50,7 @@ function GamePage({
       const cardData = await response.json();
       setDealerHandData((prev) => [...prev, cardData]);
       setDealerHandLength((prev) => prev + 1);
+      setNumberOfCards((prev) => prev - 1);
       currentHandValue += cardData.value;
       currentOrder++;
       await new Promise((resolve) => setTimeout(resolve, delay));
@@ -69,6 +62,7 @@ function GamePage({
 
   async function handleStop() {
     setStopClicked(true);
+
     await dealDealerCardsUntilThreshold(nextCardInOrder, 1000, 15, dealerHandValue);
   }
 
@@ -80,7 +74,7 @@ function GamePage({
       setDealerBalance(dealerBalance + totalBet);
       setTotalBet(0);
     }
-  }, [isGameOver]);
+  }, [dealerBalance, isGameOver, playerBalance, totalBet, winner]);
 
   return (
     <div className="game-page">
