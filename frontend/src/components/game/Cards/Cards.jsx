@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PlayerHand from './PlayerHand';
 import DealerHand from './DealerHand';
 import CardStack from './CardStack';
 import DisplayBalances from '../DisplayBalances';
 import DisplayButtons from '../DisplayButtons';
+import EndGameControls from './EndGameControls';
 
 function Cards({
   playerBalance,
@@ -37,32 +38,47 @@ function Cards({
   const [outcomeMessage, setOutcomeMessage] = useState('');
   const [userData, setUserData] = useState(user);
   const navigate = useNavigate();
+  const modalRef = useRef(null);
 
+  // Detect game end and open modal
   useEffect(() => {
+    let gameOver = false;
     if (dealerHandValue >= 22 && dealerHandLength > 2) {
       onSetWinner('player');
       setGameOver(true);
       setOutcomeMessage('Congratulation, you won!');
+      gameOver = true;
     } else if (enoughReached && dealerHandValue === 22 && dealerHandLength === 2) {
       onSetWinner('dealer');
       setGameOver(true);
       setOutcomeMessage('FIRE! Sorry, you lost!');
+      gameOver = true;
     } else if (enoughReached && dealerHandValue >= yourHandValue && dealerHandValue < 22) {
       onSetWinner('dealer');
       setGameOver(true);
       setOutcomeMessage('Sorry, you lost!');
+      gameOver = true;
     } else if (enoughReached && dealerHandValue < yourHandValue) {
       onSetWinner('player');
       setGameOver(true);
       setOutcomeMessage('Congratulation, you won!');
+      gameOver = true;
     } else if (yourHandValue >= 22 && yourHandLength > 2) {
       onSetWinner('dealer');
       setGameOver(true);
       setOutcomeMessage('Sorry, you lost!');
+      gameOver = true;
     } else if (yourHandValue === 22 && yourHandLength === 2) {
       onSetWinner('player');
       setGameOver(true);
       setOutcomeMessage('FIRE! Congratulation, you won!');
+      gameOver = true;
+    }
+    // Open modal on game over
+    if (gameOver && modalRef.current) {
+      setTimeout(() => {
+        modalRef.current.showModal();
+      }, 100);
     }
   }, [
     dealerHandValue,
@@ -74,13 +90,16 @@ function Cards({
     setGameOver,
     onGameOver,
   ]);
+
   async function handleNewGame() {
     setGameOver(true);
+    if (modalRef.current) modalRef.current.close();
     navigate('/gamepage', { replace: true });
   }
 
   async function handleQuit() {
     setGameOver(true);
+    if (modalRef.current) modalRef.current.close();
     onLoggedIn(false);
     onSuccessfulRegister(false);
     onActiveUser(null);
@@ -142,32 +161,16 @@ function Cards({
               onSubmitClicked={onSubmitClicked}
             />
           </div>
-
-          {/* Game Over Screen */}
-          {onGameOver && (
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 px-6 py-8 rounded-3xl bg-black bg-opacity-50 backdrop-blur-sm shadow-2xl border border-white/10 text-center space-y-6 w-[28rem] max-w-[90%]">
-              <h1 className="text-5xl font-extrabold text-white drop-shadow-[0_2px_12px_rgba(255,255,255,0.3)]">
-                {outcomeMessage}
-              </h1>
-
-              <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <button
-                  className="btn btn-lg bg-white text-black border-none text-2xl font-bold w-full sm:w-auto"
-                  onClick={handleNewGame}
-                >
-                  🎮 New Game
-                </button>
-                <button
-                  className="btn btn-lg bg-white text-black border-none text-2xl font-bold w-full sm:w-auto"
-                  onClick={handleQuit}
-                >
-                  🚪 Quit & Logout
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
+      {/* End Game Modal */}
+      <EndGameControls
+        ref={modalRef}
+        userData={userData}
+        outcomeMessage={outcomeMessage}
+        handleNewGame={handleNewGame}
+        handleQuit={handleQuit}
+      />
     </div>
   );
 }
