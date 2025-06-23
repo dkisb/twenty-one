@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.sql.SQLException;
 import java.util.List;
 
-@RestController
+/*@RestController
 public class CardController {
 
     private final CardService service;
@@ -18,4 +18,4 @@ public class CardController {
     public CardController(CardService service) {
         this.service = service;
     }
-}
+}*/
