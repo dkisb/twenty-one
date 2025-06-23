@@ -21,9 +21,7 @@ function Cards({
   onSetWinner,
   setGameOver,
   onGameOver,
-  gameStarted,
   user,
-  winner,
   onLoggedIn,
   onSuccessfulRegister,
   onActiveUser,
@@ -76,36 +74,13 @@ function Cards({
     setGameOver,
     onGameOver,
   ]);
-
-  async function patchUser(id, update) {
-    const response = await fetch(`/api/user/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(update),
-    });
-    return await response.json();
-  }
-
   async function handleNewGame() {
     setGameOver(true);
-    // const updated = await patchUser(userData._id, {
-    //   Balance: playerBalance,
-    //   Games: userData.Games + 1,
-    //   ...(winner === 'player' ? { Win: userData.Win + 1 } : { Loss: userData.Loss + 1 }),
-    // });
-    // onLoggedIn(true);
-    // onSuccessfulRegister(true);
-    // onActiveUser(updated);
     navigate('/gamepage', { replace: true });
   }
 
   async function handleQuit() {
     setGameOver(true);
-    const updated = await patchUser(userData._id, {
-      Balance: playerBalance,
-      Games: userData.Games + 1,
-      ...(winner === 'player' ? { Win: userData.Win + 1 } : { Loss: userData.Loss + 1 }),
-    });
     onLoggedIn(false);
     onSuccessfulRegister(false);
     onActiveUser(null);

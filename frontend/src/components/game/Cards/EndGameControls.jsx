@@ -17,7 +17,7 @@ function EndGameControls({
 
       <button
         className="btn btn-lg bg-white text-black border-none"
-        onClick={handleNewGameClick}
+        onClick={handleNewGame}
         aria-label="Start a new game"
       >
         <span className="text-3xl font-bold">🎮 New Game</span>
