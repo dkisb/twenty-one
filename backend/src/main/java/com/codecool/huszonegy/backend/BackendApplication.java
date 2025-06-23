@@ -1,6 +1,5 @@
 package com.codecool.huszonegy.backend;
 
-import com.codecool.huszonegy.backend.service.CardService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
