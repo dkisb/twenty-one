@@ -2,6 +2,8 @@ import { StrictMode } from 'react';
 import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { GameProvider } from './context/GameContext.jsx';
+import { UserProvider } from './context/UserContext.jsx';
 import './index.css';
 
 // Pages
@@ -27,6 +29,10 @@ export default function App() {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <UserProvider>
+      <GameProvider>
+        <App />
+      </GameProvider>
+    </UserProvider>
   </StrictMode>
 );

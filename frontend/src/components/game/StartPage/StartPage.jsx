@@ -1,18 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useUser } from '../../../context/UserContext';
 import GamePage from '../GamePage/GamePage';
 import StartScreen from './StartScreen';
 
-function StartPage({ onLoggedIn, onSuccessfulRegister, onActiveUser }) {
+function StartPage() {
   const location = useLocation();
   const [gameStarted, setGameStarted] = useState(false);
-  const [userData, setUserData] = useState({ _id: 1, Username: 'demo', Games: 0, Win: 0, Loss: 0 });
+  const { user, setUser } = useUser();
 
   useEffect(() => {
     const loggedInUser = location.state;
     if (loggedInUser) {
-      setUserData(loggedInUser);
+      setUser(loggedInUser);
     }
+    // else setUser({ _id: 1, Username: 'demo', Games: 0, Win: 0, Loss: 0 });
+    // Ha mindig demóval akarod, ne töröld ezt a sort.
+    // eslint-disable-next-line
   }, [location.state]);
 
   const handleStartGame = async () => {
@@ -30,19 +34,7 @@ function StartPage({ onLoggedIn, onSuccessfulRegister, onActiveUser }) {
     }
   };
 
-  return gameStarted ? (
-    <GamePage
-      gameStarted={gameStarted}
-      setGameStarted={setGameStarted}
-      user={userData}
-      onUser={setUserData}
-      onLoggedIn={onLoggedIn}
-      onSuccessfulRegister={onSuccessfulRegister}
-      onActiveUser={onActiveUser}
-    />
-  ) : (
-    <StartScreen userData={userData} onStart={handleStartGame} />
-  );
+  return gameStarted ? <GamePage /> : <StartScreen onStart={handleStartGame} />;
 }
 
 export default StartPage;

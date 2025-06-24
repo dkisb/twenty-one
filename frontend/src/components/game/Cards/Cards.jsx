@@ -1,74 +1,59 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useGame } from '../../../context/GameContext';
+import { useUser } from '../../../context/UserContext';
 import PlayerHand from './PlayerHand';
 import DealerHand from './DealerHand';
 import CardStack from './CardStack';
-import DisplayBalances from '../DisplayBalances';
-import DisplayButtons from '../DisplayButtons';
+import DisplayBalances from './DisplayBalances';
+import DisplayButtons from './DisplayButtons';
 import EndGameControls from './EndGameControls';
 
-function Cards({
-  playerBalance,
-  dealerBalance,
-  numberOfCards,
-  yourHandLength,
-  dealerHandLength,
-  yourHandData,
-  dealerHandData,
-  yourHandValue,
-  dealerHandValue,
-  stopClicked,
-  enoughReached,
-  onSetWinner,
-  setGameOver,
-  onGameOver,
-  user,
-  onLoggedIn,
-  onSuccessfulRegister,
-  onActiveUser,
-  onHandleMore,
-  onHandleStop,
-  onBet,
-  onSetDealer,
-  onSetPlayer,
-  currentTotal,
-  betSubmitClicked,
-  onSubmitClicked,
-}) {
+function Cards() {
+  const {
+    state,
+    yourHandValue,
+    dealerHandValue,
+    addPlayerCard,
+    addDealerCard,
+    setGameOver,
+    setStopClicked,
+    setEnoughReached,
+    setPlayerBalance,
+    setDealerBalance,
+    setTotalBet,
+    resetGame,
+    setBetSubmitClicked,
+  } = useGame();
+  const { user, logout } = useUser();
+
   const [outcomeMessage, setOutcomeMessage] = useState('');
-  const [userData, setUserData] = useState(user);
   const modalRef = useRef(null);
 
+  // Effect: outcome check
   useEffect(() => {
     let gameOver = false;
-    if (dealerHandValue >= 22 && dealerHandLength > 2) {
-      onSetWinner('player');
-      setGameOver(true);
+    if (dealerHandValue >= 22 && state.dealerHand.length > 2) {
+      setGameOver('player');
       setOutcomeMessage('Congratulation, you won!');
       gameOver = true;
-    } else if (enoughReached && dealerHandValue === 22 && dealerHandLength === 2) {
-      onSetWinner('dealer');
-      setGameOver(true);
+    } else if (state.enoughReached && dealerHandValue === 22 && state.dealerHand.length === 2) {
+      setGameOver('dealer');
       setOutcomeMessage('FIRE! Sorry, you lost!');
       gameOver = true;
-    } else if (enoughReached && dealerHandValue >= yourHandValue && dealerHandValue < 22) {
-      onSetWinner('dealer');
-      setGameOver(true);
+    } else if (state.enoughReached && dealerHandValue >= yourHandValue && dealerHandValue < 22) {
+      setGameOver('dealer');
       setOutcomeMessage('Sorry, you lost!');
       gameOver = true;
-    } else if (enoughReached && dealerHandValue < yourHandValue) {
-      onSetWinner('player');
-      setGameOver(true);
+    } else if (state.enoughReached && dealerHandValue < yourHandValue) {
+      setGameOver('player');
       setOutcomeMessage('Congratulation, you won!');
       gameOver = true;
-    } else if (yourHandValue >= 22 && yourHandLength > 2) {
-      onSetWinner('dealer');
-      setGameOver(true);
+    } else if (yourHandValue >= 22 && state.yourHand.length > 2) {
+      setGameOver('dealer');
       setOutcomeMessage('Sorry, you lost!');
       gameOver = true;
-    } else if (yourHandValue === 22 && yourHandLength === 2) {
-      onSetWinner('player');
-      setGameOver(true);
+    } else if (yourHandValue === 22 && state.yourHand.length === 2) {
+      setGameOver('player');
       setOutcomeMessage('FIRE! Congratulation, you won!');
       gameOver = true;
     }
@@ -77,16 +62,48 @@ function Cards({
         modalRef.current.showModal();
       }, 100);
     }
-  }, [
-    dealerHandValue,
-    dealerHandLength,
-    enoughReached,
-    yourHandValue,
-    yourHandLength,
-    onSetWinner,
-    setGameOver,
-    onGameOver,
-  ]);
+    // eslint-disable-next-line
+  }, [dealerHandValue, state.dealerHand.length, state.enoughReached, yourHandValue, state.yourHand.length]);
+
+  // Effect: handle winner/balances
+  useEffect(() => {
+    if (!state.winner) return;
+    if (state.winner === 'player') {
+      setPlayerBalance(state.playerBalance + state.totalBet);
+      setTotalBet(0);
+    } else if (state.winner === 'dealer') {
+      setDealerBalance(state.dealerBalance + state.totalBet);
+      setTotalBet(0);
+    }
+    // eslint-disable-next-line
+  }, [state.winner]);
+
+  async function handleMore() {
+    const response = await fetch(`/api/shuffle/getnext/1?order=${state.nextCardInOrder}`);
+    const cardData = await response.json();
+    addPlayerCard(cardData);
+  }
+
+  async function dealDealerCardsUntilThreshold(startingOrder, delay, threshold, initialHandValue) {
+    let currentOrder = startingOrder;
+    let currentHandValue = initialHandValue;
+    while (currentHandValue < threshold) {
+      const response = await fetch(`/api/shuffle/getnext/1?order=${currentOrder}`);
+      const cardData = await response.json();
+      addDealerCard(cardData);
+      currentHandValue += cardData.value;
+      currentOrder++;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+    if (currentHandValue >= threshold) {
+      setEnoughReached();
+    }
+  }
+
+  async function handleStop() {
+    setStopClicked();
+    await dealDealerCardsUntilThreshold(state.nextCardInOrder, 1000, 15, dealerHandValue);
+  }
 
   async function handleNewGame() {
     const newShuffle = await fetch('/api/shuffle/1', {
@@ -96,16 +113,14 @@ function Cards({
     if (!newShuffle.ok) {
       throw new Error('Failed to start a new shuffle');
     }
-    setGameOver(true);
+    resetGame();
     if (modalRef.current) modalRef.current.close();
   }
 
-  async function handleQuit() {
-    setGameOver(true);
+  function handleQuit() {
+    resetGame();
     if (modalRef.current) modalRef.current.close();
-    onLoggedIn(false);
-    onSuccessfulRegister(false);
-    onActiveUser(null);
+    logout();
   }
 
   return (
@@ -115,60 +130,33 @@ function Cards({
           {/* Left side: Balances */}
           <div className="absolute top-1/2 left-4 transform -translate-y-1/2">
             <DisplayBalances
-              dealerMax={dealerBalance}
-              playerMax={playerBalance}
-              currentTotal={currentTotal}
-              currentUser={userData}
+              dealerMax={state.dealerBalance}
+              playerMax={state.playerBalance}
+              currentTotal={state.totalBet}
+              currentUser={user}
             />
           </div>
-
           {/* Top center: Dealer hand */}
           <div className="absolute top-4 sm:top-6 left-1/2 transform -translate-x-1/2">
-            <DealerHand
-              dealerHandData={dealerHandData}
-              dealerHandValue={dealerHandValue}
-              dealerHandLength={dealerHandLength}
-              enoughReached={enoughReached}
-              gameOver={onGameOver}
-            />
+            <DealerHand />
           </div>
-
           {/* Bottom center: Player hand */}
           <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
-            <PlayerHand yourHandData={yourHandData} yourHandValue={yourHandValue} user={userData} />
+            <PlayerHand />
           </div>
-
           {/* Right side: Card stack */}
           <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
-            <CardStack numberOfCards={numberOfCards} />
+            <CardStack />
           </div>
-
           {/* Bottom right: Buttons */}
           <div className="absolute bottom-6 right-6">
-            <DisplayButtons
-              onHandleMore={onHandleMore}
-              yourHandValue={yourHandValue}
-              dealerHandValue={dealerHandValue}
-              yourHandLength={yourHandLength}
-              dealerHandLength={dealerHandLength}
-              onHandleStop={onHandleStop}
-              stopClicked={stopClicked}
-              enoughReached={enoughReached}
-              onBet={onBet}
-              onSetDealer={onSetDealer}
-              onSetPlayer={onSetPlayer}
-              dealerMax={dealerBalance}
-              playerMax={playerBalance}
-              currentTotal={currentTotal}
-              betSubmitClicked={betSubmitClicked}
-              onSubmitClicked={onSubmitClicked}
-            />
+            <DisplayButtons onHandleMore={handleMore} onHandleStop={handleStop} />
           </div>
         </div>
       </div>
       <EndGameControls
         ref={modalRef}
-        userData={userData}
+        userData={user}
         outcomeMessage={outcomeMessage}
         handleNewGame={handleNewGame}
         handleQuit={handleQuit}

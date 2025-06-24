@@ -1,9 +1,15 @@
-function PlayerHand({ yourHandData, yourHandValue, user }) {
+import { useGame } from '../../../context/GameContext';
+import { useUser } from '../../../context/UserContext';
+
+function PlayerHand() {
+  const { state, yourHandValue } = useGame();
+  const { user } = useUser();
+
   return (
     <div className="flex flex-col items-center justify-center space-y-2">
       {/* Cards */}
       <div className="flex gap-2 justify-center flex-wrap">
-        {yourHandData.map((card, index) => (
+        {state.yourHand.map((card, index) => (
           <img
             key={index}
             src={card.frontImagePath}
@@ -12,8 +18,6 @@ function PlayerHand({ yourHandData, yourHandValue, user }) {
           />
         ))}
       </div>
-
-      {/* Username and Value stacked below */}
       <p className="text-lg font-bold text-white">{user?.Username || 'Player'}</p>
       <p className="text-lg font-semibold text-white">Value: {yourHandValue}</p>
     </div>

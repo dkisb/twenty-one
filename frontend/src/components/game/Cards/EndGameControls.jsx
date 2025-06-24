@@ -1,17 +1,16 @@
 import { Link } from 'react-router-dom';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { useUser } from '../../../context/UserContext';
 
-const EndGameControls = forwardRef(function EndGameControlsModal(
-  { userData, outcomeMessage, handleNewGame, handleQuit },
-  ref
-) {
+const EndGameControls = forwardRef(function EndGameControlsModal({ outcomeMessage, handleNewGame, handleQuit }, ref) {
   const innerRef = useRef(null);
   useImperativeHandle(ref, () => ({
     showModal: () => innerRef.current?.showModal(),
     close: () => innerRef.current?.close(),
   }));
 
-  const { Games, Win, Loss } = userData ?? {};
+  const { user } = useUser();
+  const { Games, Win, Loss } = user ?? {};
 
   return (
     <dialog ref={innerRef} className="modal bg-transparent" style={{ background: 'rgba(30, 41, 59, 0.35)' }}>
@@ -20,7 +19,7 @@ const EndGameControls = forwardRef(function EndGameControlsModal(
           {outcomeMessage}
         </h1>
 
-        {userData && (
+        {user && (
           <div className="flex flex-row justify-center gap-6 mb-6 text-lg font-semibold text-gray-700 dark:text-gray-300">
             <div>
               <span className="font-bold text-slate-800 dark:text-white">Games:</span> {Games}
@@ -58,7 +57,6 @@ const EndGameControls = forwardRef(function EndGameControlsModal(
           </Link>
         </div>
       </div>
-
       <form method="dialog" className="modal-backdrop">
         <button className="cursor-default bg-transparent"></button>
       </form>
