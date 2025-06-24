@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useUser } from '../../../context/UserContext';
 
-function StartScreen({ userData, onStart }) {
+function StartScreen({ onStart }) {
+  const { user } = useUser();
+
   const handleHelpClick = () => {
     window.open('https://hu.wikipedia.org/wiki/Huszonegyes');
   };
@@ -39,7 +42,7 @@ function StartScreen({ userData, onStart }) {
               <span className="text-2xl font-semibold">📖 Rules</span>
             </button>
 
-            <Link to="/account" state={userData}>
+            <Link to="/account" state={user}>
               <button className="btn btn-lg bg-white text-black border-none">
                 <span className="text-2xl font-semibold">👤 Account</span>
               </button>
