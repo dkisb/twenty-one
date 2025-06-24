@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Cards from '../Cards/Cards.jsx';
 
-function GamePage({ gameStarted, user, onLoggedIn, onSuccessfulRegister, onActiveUser }) {
+function GamePage({ user, onLoggedIn, onSuccessfulRegister, onActiveUser }) {
   const [yourHandLength, setYourHandLength] = useState(0);
   const [dealerHandLength, setDealerHandLength] = useState(0);
   const [upperCardData, setUpperCardData] = useState(null);
@@ -100,7 +100,6 @@ function GamePage({ gameStarted, user, onLoggedIn, onSuccessfulRegister, onActiv
         onTotalBet={setTotalBet}
         setGameOver={setIsGameOver}
         onGameOver={isGameOver}
-        gameStarted={gameStarted}
         user={user}
         winner={winner}
         onLoggedIn={onLoggedIn}
