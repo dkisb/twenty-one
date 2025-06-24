@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import PlayerHand from './PlayerHand';
 import DealerHand from './DealerHand';
 import CardStack from './CardStack';
@@ -37,10 +37,8 @@ function Cards({
 }) {
   const [outcomeMessage, setOutcomeMessage] = useState('');
   const [userData, setUserData] = useState(user);
-  const navigate = useNavigate();
   const modalRef = useRef(null);
 
-  // Detect game end and open modal
   useEffect(() => {
     let gameOver = false;
     if (dealerHandValue >= 22 && dealerHandLength > 2) {
@@ -74,7 +72,6 @@ function Cards({
       setOutcomeMessage('FIRE! Congratulation, you won!');
       gameOver = true;
     }
-    // Open modal on game over
     if (gameOver && modalRef.current) {
       setTimeout(() => {
         modalRef.current.showModal();
@@ -92,9 +89,15 @@ function Cards({
   ]);
 
   async function handleNewGame() {
+    const newShuffle = await fetch('/api/shuffle/1', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!newShuffle.ok) {
+      throw new Error('Failed to start a new shuffle');
+    }
     setGameOver(true);
     if (modalRef.current) modalRef.current.close();
-    navigate('/gamepage', { replace: true });
   }
 
   async function handleQuit() {
@@ -163,7 +166,6 @@ function Cards({
           </div>
         </div>
       </div>
-      {/* End Game Modal */}
       <EndGameControls
         ref={modalRef}
         userData={userData}

@@ -35,14 +35,17 @@ const EndGameControls = forwardRef(function EndGameControlsModal(
         )}
 
         <div className="flex flex-col sm:flex-row justify-center gap-4 mt-4">
-          <button
-            className="btn btn-lg btn-success w-full sm:w-auto text-2xl font-bold shadow-md"
-            onClick={handleNewGame}
-            aria-label="Start a new game"
-            type="button"
-          >
-            <span className="mr-2">🎮</span> New Game
-          </button>
+          <Link to="/gamepage" className="w-full sm:w-auto">
+            <button
+              className="btn btn-lg btn-success w-full sm:w-auto text-2xl font-bold shadow-md"
+              onClick={handleNewGame}
+              aria-label="Start a new game"
+              type="button"
+            >
+              <span className="mr-2">🎮</span> New Game
+            </button>
+          </Link>
+
           <Link to="/" className="w-full sm:w-auto">
             <button
               className="btn btn-lg btn-error w-full text-2xl font-bold shadow-md"

@@ -17,6 +17,13 @@ function StartPage({ onLoggedIn, onSuccessfulRegister, onActiveUser }) {
 
   const handleStartGame = async () => {
     try {
+      const newShuffle = await fetch('/api/shuffle/1', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!newShuffle.ok) {
+        throw new Error('Failed to start a new shuffle');
+      }
       setGameStarted(true);
     } catch (error) {
       console.error('Error starting game:', error);
@@ -26,6 +33,7 @@ function StartPage({ onLoggedIn, onSuccessfulRegister, onActiveUser }) {
   return gameStarted ? (
     <GamePage
       gameStarted={gameStarted}
+      setGameStarted={setGameStarted}
       user={userData}
       onUser={setUserData}
       onLoggedIn={onLoggedIn}
