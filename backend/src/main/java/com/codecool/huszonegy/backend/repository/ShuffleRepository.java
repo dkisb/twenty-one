@@ -16,9 +16,5 @@ public interface ShuffleRepository extends JpaRepository<Shuffle, Integer> {
 
     @Modifying
     @Transactional
-    @Query(
-            value = "INSERT INTO shuffles (user_id, card_order, card_id) VALUES (:userId, :cardOrder, :cardId)",
-            nativeQuery = true
-    )
-    void insertShuffledCard(@Param("userId") int userId, @Param("cardOrder") int cardOrder, @Param("cardId") int cardId);
+    void deleteByUserId(int userId);
 }

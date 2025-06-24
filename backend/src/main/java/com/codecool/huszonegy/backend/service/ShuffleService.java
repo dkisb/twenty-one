@@ -2,8 +2,8 @@ package com.codecool.huszonegy.backend.service;
 
 import com.codecool.huszonegy.backend.model.Card;
 import com.codecool.huszonegy.backend.model.Shuffle;
+import com.codecool.huszonegy.backend.repository.CardRepository;
 import com.codecool.huszonegy.backend.repository.ShuffleRepository;
-import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -16,20 +16,23 @@ import java.util.ArrayList;
 @Service
 public class ShuffleService {
     private final ShuffleRepository shuffleRepository;
-    private final EntityManager entityManager;
+    private final CardRepository cardRepository;
 
-    public ShuffleService(ShuffleRepository shuffleRepository, EntityManager entityManager) {
+    public ShuffleService(ShuffleRepository shuffleRepository, CardRepository cardRepository) {
         this.shuffleRepository = shuffleRepository;
-        this.entityManager = entityManager;
+        this.cardRepository = cardRepository;
     }
 
     public void addShuffledDeck(int userId) {
-        List<Integer> shuffledCardIds = getShuffledCardIds();
+        shuffleRepository.deleteByUserId(userId);
+        List<Integer> shuffledCardIndexes = getShuffledCardIndexes();
         List<Shuffle> cardsToSave = new ArrayList<>();
-        for (int i = 0; i < shuffledCardIds.size(); i++) {
-            int cardId = shuffledCardIds.get(i);
-            Card cardRef = entityManager.getReference(Card.class, cardId);
-            cardsToSave.add(new Shuffle(cardRef, userId, i + 1));
+        List<Card> allCards = cardRepository.findAll();
+        for (int i = 0; i < shuffledCardIndexes.size(); i++) {
+            int cardId = shuffledCardIndexes.get(i);
+            Card card = allCards.stream().filter(e -> e.getId() == cardId).findFirst()
+                    .orElseThrow(() -> new NoSuchElementException("Card not found"));
+            cardsToSave.add(new Shuffle(card, userId, i + 1));
         }
         shuffleRepository.saveAll(cardsToSave);
     }
@@ -39,7 +42,7 @@ public class ShuffleService {
                 .orElseThrow(() -> new NoSuchElementException("Card not found"));
     }
 
-    private List<Integer> getShuffledCardIds() {
+    private List<Integer> getShuffledCardIndexes() {
         List<Integer> cardIds = IntStream.rangeClosed(1, 32)
                 .boxed()
                 .collect(Collectors.toList());
