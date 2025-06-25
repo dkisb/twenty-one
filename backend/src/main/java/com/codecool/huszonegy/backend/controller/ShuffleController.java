@@ -16,7 +16,7 @@ public class ShuffleController {
         this.shuffleService = shuffleService;
     }
 
-    @PostMapping("/generate/{userId}")
+    @PostMapping("/{userId}")
     public String generateShuffledDeck(@PathVariable int userId) {
         shuffleService.addShuffledDeck(userId);
         return "Shuffled deck generated for user " + userId;
