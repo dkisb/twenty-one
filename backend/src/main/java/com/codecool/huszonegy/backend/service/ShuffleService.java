@@ -6,21 +6,20 @@ import com.codecool.huszonegy.backend.repository.CardRepository;
 import com.codecool.huszonegy.backend.repository.ShuffleRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.ArrayList;
 
 @Service
 public class ShuffleService {
     private final ShuffleRepository shuffleRepository;
     private final CardRepository cardRepository;
+    private Random random;
 
-    public ShuffleService(ShuffleRepository shuffleRepository, CardRepository cardRepository) {
+    public ShuffleService(ShuffleRepository shuffleRepository, CardRepository cardRepository, Random random) {
         this.shuffleRepository = shuffleRepository;
         this.cardRepository = cardRepository;
+        this.random = random;
     }
 
     public void addShuffledDeck(int userId) {
@@ -29,8 +28,8 @@ public class ShuffleService {
         List<Shuffle> cardsToSave = new ArrayList<>();
         List<Card> allCards = cardRepository.findAll();
         for (int i = 0; i < shuffledCardIndexes.size(); i++) {
-            int cardId = shuffledCardIndexes.get(i);
-            Card card = allCards.stream().filter(e -> e.getId() == cardId).findFirst()
+            int carCardServicedId = shuffledCardIndexes.get(i);
+            Card card = allCards.stream().filter(e -> e.getId() == carCardServicedId).findFirst()
                     .orElseThrow(() -> new NoSuchElementException("Card not found"));
             cardsToSave.add(new Shuffle(card, userId, i + 1));
         }
@@ -42,11 +41,11 @@ public class ShuffleService {
                 .orElseThrow(() -> new NoSuchElementException("Card not found"));
     }
 
-    private List<Integer> getShuffledCardIndexes() {
-        List<Integer> cardIds = IntStream.rangeClosed(1, 32)
+    List<Integer> getShuffledCardIndexes() {
+        List<Integer> cardIndexes = IntStream.rangeClosed(1, 32)
                 .boxed()
                 .collect(Collectors.toList());
-        Collections.shuffle(cardIds);
-        return cardIds;
+        Collections.shuffle(cardIndexes, random);
+        return cardIndexes;
     }
 }
