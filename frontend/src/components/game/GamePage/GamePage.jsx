@@ -7,7 +7,6 @@ function GamePage() {
   const { user } = useUser();
   const { resetGame, setPlayerBalance } = useGame();
 
-  // Ha a user változik (pl. login után), frissítsd a balance-ot
   React.useEffect(() => {
     if (user && user.Balance != null) {
       setPlayerBalance(user.Balance);

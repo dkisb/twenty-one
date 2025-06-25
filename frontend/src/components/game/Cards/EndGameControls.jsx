@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { useUser } from '../../../context/UserContext';
 
@@ -11,7 +10,6 @@ const EndGameControls = forwardRef(function EndGameControlsModal({ outcomeMessag
 
   const { user } = useUser();
   const { Games, Win, Loss } = user ?? {};
-
   return (
     <dialog ref={innerRef} className="modal bg-transparent" style={{ background: 'rgba(30, 41, 59, 0.35)' }}>
       <div className="modal-box glass bg-white/60 dark:bg-slate-800/80 shadow-2xl border border-white/20 backdrop-blur-lg transition-all">
@@ -34,32 +32,25 @@ const EndGameControls = forwardRef(function EndGameControlsModal({ outcomeMessag
         )}
 
         <div className="flex flex-col sm:flex-row justify-center gap-4 mt-4">
-          <Link to="/gamepage" className="w-full sm:w-auto">
-            <button
-              className="btn btn-lg btn-success w-full sm:w-auto text-2xl font-bold shadow-md"
-              onClick={handleNewGame}
-              aria-label="Start a new game"
-              type="button"
-            >
-              <span className="mr-2">🎮</span> New Game
-            </button>
-          </Link>
+          <button
+            className="btn btn-lg btn-success w-full sm:w-auto text-2xl font-bold shadow-md"
+            onClick={handleNewGame}
+            aria-label="Start a new game"
+            type="button"
+          >
+            <span className="mr-2">🎮</span> New Game
+          </button>
 
-          <Link to="/" className="w-full sm:w-auto">
-            <button
-              className="btn btn-lg btn-error w-full text-2xl font-bold shadow-md"
-              onClick={handleQuit}
-              aria-label="Quit and logout"
-              type="button"
-            >
-              <span className="mr-2">🚪</span> Quit &amp; Logout
-            </button>
-          </Link>
+          <button
+            className="w-full sm:w-auto btn btn-lg btn-error text-2xl font-bold shadow-md"
+            onClick={handleQuit}
+            aria-label="Quit and logout"
+            type="button"
+          >
+            <span className="mr-2">🚪</span> Quit &amp; Logout
+          </button>
         </div>
       </div>
-      <form method="dialog" className="modal-backdrop">
-        <button className="cursor-default bg-transparent"></button>
-      </form>
     </dialog>
   );
 });

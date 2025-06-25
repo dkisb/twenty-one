@@ -73,10 +73,10 @@ Twenty-One (21) is a modern web version of the classic Hungarian card game. It s
 ### Built With
 
 - [![React][React.js]][React-url]
-- [Vite][Vite-url]
-- [Java Spring Boot][Spring-url]
-- [PostgreSQL][Postgres-url]
-- [Tailwind CSS][Tailwind-url]
+- [![Vite-url][Vite.js]][Vite-url]
+- [![Java Spring Boot][Spring]][Spring-url]
+- [![PostgreSQL][PostgreSQL]][Postgres-url]
+- [![Tailwind-url][Tailwind.js]][Tailwind-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -200,7 +200,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-Dániel Kiss - [@dkisb](https://github.com/dkisb)
+Döme Kisbalázs - [@dkisb](https://github.com/dkisb)
 
 Project Link: [https://github.com/dkisb/twenty-one](https://github.com/dkisb/twenty-one)
 
@@ -210,7 +210,6 @@ Project Link: [https://github.com/dkisb/twenty-one](https://github.com/dkisb/twe
 
 ## Acknowledgments
 
-- [othneildrew/Best-README-Template](https://github.com/othneildrew/Best-README-Template)
 - [React](https://reactjs.org/)
 - [Java Spring](https://spring.io/)
 - [PostgreSQL](https://www.postgresql.org/)
@@ -234,7 +233,13 @@ Project Link: [https://github.com/dkisb/twenty-one](https://github.com/dkisb/twe
 [product-screenshot]: public/screenshot.png
 [React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
 [React-url]: https://reactjs.org/
+[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[React-url]: https://react.dev/
+[Vite.js]: https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=FFD62E
 [Vite-url]: https://vitejs.dev/
+[Spring]: https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white
 [Spring-url]: https://spring.io/projects/spring-boot
+[PostgreSQL]: https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white
 [Postgres-url]: https://www.postgresql.org/
+[Tailwind.js]: https://img.shields.io/badge/Tailwind_CSS-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white
 [Tailwind-url]: https://tailwindcss.com/
