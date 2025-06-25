@@ -22,15 +22,30 @@ function Cards() {
     setDealerBalance,
     setTotalBet,
     resetGame,
-    setBetSubmitClicked,
   } = useGame();
   const { user, logout } = useUser();
 
   const [outcomeMessage, setOutcomeMessage] = useState('');
   const modalRef = useRef(null);
 
+  // Ref to skip outcome effect on initial render or after reset
+  const skipOutcomeRef = useRef(true);
+
+  // Set skipOutcomeRef to true after resetGame (new game)
+  useEffect(() => {
+    // We consider a reset has happened when both hands are empty
+    if (state.yourHand.length === 0 && state.dealerHand.length === 0) {
+      skipOutcomeRef.current = true;
+    }
+  }, [state.yourHand.length, state.dealerHand.length]);
+
   // Effect: outcome check
   useEffect(() => {
+    if (skipOutcomeRef.current) {
+      skipOutcomeRef.current = false;
+      return;
+    }
+
     let gameOver = false;
     if (dealerHandValue >= 22 && state.dealerHand.length > 2) {
       setGameOver('player');
@@ -117,10 +132,13 @@ function Cards() {
     if (modalRef.current) modalRef.current.close();
   }
 
-  function handleQuit() {
+  async function handleQuit() {
     resetGame();
-    if (modalRef.current) modalRef.current.close();
-    logout();
+    const result = logout();
+    if (result instanceof Promise) {
+      await result;
+    }
+    window.location.href = '/';
   }
 
   return (
