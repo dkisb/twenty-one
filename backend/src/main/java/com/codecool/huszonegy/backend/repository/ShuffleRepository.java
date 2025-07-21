@@ -1,7 +1,7 @@
 package com.codecool.huszonegy.backend.repository;
 
-import com.codecool.huszonegy.backend.model.Card;
-import com.codecool.huszonegy.backend.model.Shuffle;
+import com.codecool.huszonegy.backend.model.entity.Card;
+import com.codecool.huszonegy.backend.model.entity.Shuffle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

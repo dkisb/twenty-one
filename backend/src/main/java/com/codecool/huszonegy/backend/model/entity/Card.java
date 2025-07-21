@@ -1,10 +1,8 @@
-package com.codecool.huszonegy.backend.model;
+package com.codecool.huszonegy.backend.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Base64;
 
 
 @Entity

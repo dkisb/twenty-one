@@ -1,6 +1,6 @@
 package com.codecool.huszonegy.backend.service;
 
-import com.codecool.huszonegy.backend.model.Card;
+import com.codecool.huszonegy.backend.model.entity.Card;
 import com.codecool.huszonegy.backend.repository.ShuffleRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

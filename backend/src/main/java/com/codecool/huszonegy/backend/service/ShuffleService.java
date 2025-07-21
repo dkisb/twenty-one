@@ -1,7 +1,7 @@
 package com.codecool.huszonegy.backend.service;
 
-import com.codecool.huszonegy.backend.model.Card;
-import com.codecool.huszonegy.backend.model.Shuffle;
+import com.codecool.huszonegy.backend.model.entity.Card;
+import com.codecool.huszonegy.backend.model.entity.Shuffle;
 import com.codecool.huszonegy.backend.repository.CardRepository;
 import com.codecool.huszonegy.backend.repository.ShuffleRepository;
 import org.springframework.stereotype.Service;
