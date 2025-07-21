@@ -1,4 +1,4 @@
-package com.codecool.huszonegy.backend.model;
+package com.codecool.huszonegy.backend.model.entity;
 
 
 import jakarta.persistence.*;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "users")
-public class User {
+public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

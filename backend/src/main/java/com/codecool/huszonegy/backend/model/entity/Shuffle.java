@@ -1,4 +1,4 @@
-package com.codecool.huszonegy.backend.model;
+package com.codecool.huszonegy.backend.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
