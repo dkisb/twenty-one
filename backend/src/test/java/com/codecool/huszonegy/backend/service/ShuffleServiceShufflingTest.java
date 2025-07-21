@@ -23,15 +23,9 @@ public class ShuffleServiceShufflingTest {
 
         List<Integer> result = service.getShuffledCardIndexes();
         List<Integer> expected = Arrays.asList(
-                18, 10, 21, 23, 16, 2, 8, 13,
-                11, 30, 12, 19, 22, 14, 25, 28,
-                3, 5, 4, 7, 29, 20, 27, 1,
-                26, 17, 9, 32, 31, 6, 15, 24
-
+                18, 10, 21, 23, 16, 2, 8, 13, 11, 30, 12, 19, 22, 14, 25, 28,
+                3, 5, 4, 7, 29, 20, 27, 1, 26, 17, 9, 32, 31, 6, 15, 24
         );
-
-        // Assert: Ez az érték mindig ugyanaz lesz, ha a seed fix
-
         assertEquals(expected, result);
     }
 }
