@@ -5,6 +5,7 @@ import com.codecool.huszonegy.backend.model.entity.Shuffle;
 import com.codecool.huszonegy.backend.repository.CardRepository;
 import com.codecool.huszonegy.backend.repository.ShuffleRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,7 +22,7 @@ public class ShuffleService {
         this.cardRepository = cardRepository;
         this.random = random;
     }
-
+    @Transactional
     public void addShuffledDeck(int userId) {
         shuffleRepository.deleteByUserId(userId);
         List<Integer> shuffledCardIndexes = getShuffledCardIndexes();
