@@ -15,13 +15,14 @@ import java.util.stream.IntStream;
 public class ShuffleService {
     private final ShuffleRepository shuffleRepository;
     private final CardRepository cardRepository;
-    private Random random;
+    private final Random random;
 
     public ShuffleService(ShuffleRepository shuffleRepository, CardRepository cardRepository, Random random) {
         this.shuffleRepository = shuffleRepository;
         this.cardRepository = cardRepository;
         this.random = random;
     }
+
     @Transactional
     public void addShuffledDeck(int userId) {
         shuffleRepository.deleteByUserId(userId);
