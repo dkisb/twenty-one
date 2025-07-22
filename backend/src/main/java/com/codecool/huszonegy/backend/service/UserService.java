@@ -1,4 +1,6 @@
 package com.codecool.huszonegy.backend.service;
 
-public class UserService {
+
+public class UserService  {
+
 }
