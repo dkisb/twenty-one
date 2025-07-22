@@ -28,5 +28,4 @@ public class UserEntity {
     private int lostGames = 0;
     private int creditBalance = 0;
 
-
 }
