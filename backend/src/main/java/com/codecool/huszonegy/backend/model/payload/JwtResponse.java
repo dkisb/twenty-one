@@ -1,5 +1,5 @@
 package com.codecool.huszonegy.backend.model.payload;
 
-import com.codecool.huszonegy.backend.model.entity.Roles;
+import java.util.List;
 
-public record JwtResponse(String jwt, String userName, Roles role) {}
+public record JwtResponse(String jwt, String userName, List<String> roles) {}
