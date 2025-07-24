@@ -3,6 +3,8 @@ package com.codecool.huszonegy.backend.controller;
 import com.codecool.huszonegy.backend.model.entity.Card;
 import com.codecool.huszonegy.backend.service.ShuffleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,14 +18,18 @@ public class ShuffleController {
         this.shuffleService = shuffleService;
     }
 
-    @PostMapping("/{userId}")
-    public String generateShuffledDeck(@PathVariable int userId) {
-        shuffleService.addShuffledDeck(userId);
-        return "Shuffled deck generated for user " + userId;
+    @PostMapping()
+    public String generateShuffledDeck() {
+        User user = (User) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        shuffleService.addShuffledDeck(user.getUsername());
+        return "Shuffled deck generated for user " + user.getUsername();
     }
 
-    @GetMapping("/getnext/{userId}")
-        public Card getNextCardFromDeck(@PathVariable int userId,@RequestParam int order) {
-        return shuffleService.getNextCardFromDeck(userId, order);
+    @GetMapping("/getnext")
+        public Card getNextCardFromDeck(@RequestParam int order) {
+        User user = (User) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        return shuffleService.getNextCardFromDeck(user.getUsername(), order);
     }
 }

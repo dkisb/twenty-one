@@ -94,16 +94,39 @@ function Cards() {
   }, [state.winner]);
 
   async function handleMore() {
-    const response = await fetch(`/api/shuffle/getnext/1?order=${state.nextCardInOrder}`);
-    const cardData = await response.json();
-    addPlayerCard(cardData);
+    const token = localStorage.getItem('jwtToken');
+    try {
+      const response = await fetch(`/api/shuffle/getnext?order=${state.nextCardInOrder}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`An error occurred while pulling the card: ${response.status}`);
+      }
+
+      const cardData = await response.json();
+      addPlayerCard(cardData);
+    } catch (error) {
+      console.error('An error occurred while pulling the next card:', error);
+    }
   }
 
   async function dealDealerCardsUntilThreshold(startingOrder, delay, threshold, initialHandValue) {
+    const token = localStorage.getItem('jwtToken');
     let currentOrder = startingOrder;
     let currentHandValue = initialHandValue;
     while (currentHandValue < threshold) {
-      const response = await fetch(`/api/shuffle/getnext/1?order=${currentOrder}`);
+      const response = await fetch(`/api/shuffle/getnext?order=${currentOrder}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
       const cardData = await response.json();
       addDealerCard(cardData);
       currentHandValue += cardData.value;
@@ -121,9 +144,13 @@ function Cards() {
   }
 
   async function handleNewGame() {
-    const newShuffle = await fetch('/api/shuffle/1', {
+    const token = localStorage.getItem('jwtToken');
+    const newShuffle = await fetch('/api/shuffle', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
     });
     if (!newShuffle.ok) {
       throw new Error('Failed to start a new shuffle');

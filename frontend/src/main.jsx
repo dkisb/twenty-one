@@ -8,6 +8,7 @@ import './index.css';
 
 // Pages
 import LoginPage from './components/authentication/Login/LoginPage.jsx';
+import RegisterPage from './components/authentication/Register/RegisterPage.jsx';
 import StartPage from './components/game/StartPage/StartPage.jsx';
 import GamePage from './components/game/GamePage/GamePage.jsx';
 import AccountPage from './components/account/AccountPage/AccountPage.jsx';
@@ -17,22 +18,26 @@ export default function App() {
   const [gameKey, setGameKey] = useState(0);
 
   const router = createBrowserRouter([
-    { path: '/', element: <StartPage /> },
+    { path: '/', element: <LoginPage /> },
+    { path: '/startpage', element: <StartPage /> },
+    { path: '/register', element: <RegisterPage /> },
     {
       path: '/gamepage',
       element: <GamePage key={gameKey} onNewGame={() => setGameKey((k) => k + 1)} />,
     },
+    { path: '/account', element: <AccountPage /> },
+    { path: '/account/update', element: <AccountUpdater /> },
   ]);
 
   return <RouterProvider router={router} />;
 }
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <UserProvider>
-      <GameProvider>
-        <App />
-      </GameProvider>
-    </UserProvider>
-  </StrictMode>
+    <StrictMode>
+      <UserProvider>
+        <GameProvider>
+          <App />
+        </GameProvider>
+      </UserProvider>
+    </StrictMode>
 );

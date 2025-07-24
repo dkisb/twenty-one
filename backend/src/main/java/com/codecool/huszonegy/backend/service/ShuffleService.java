@@ -4,6 +4,7 @@ import com.codecool.huszonegy.backend.model.entity.Card;
 import com.codecool.huszonegy.backend.model.entity.Shuffle;
 import com.codecool.huszonegy.backend.repository.CardRepository;
 import com.codecool.huszonegy.backend.repository.ShuffleRepository;
+import com.codecool.huszonegy.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,15 +17,19 @@ public class ShuffleService {
     private final ShuffleRepository shuffleRepository;
     private final CardRepository cardRepository;
     private final Random random;
+    //private final UserRepository userRepository;
+    private final UserService userService;
 
-    public ShuffleService(ShuffleRepository shuffleRepository, CardRepository cardRepository, Random random) {
+    public ShuffleService(ShuffleRepository shuffleRepository, CardRepository cardRepository, Random random, UserService userService) {
         this.shuffleRepository = shuffleRepository;
         this.cardRepository = cardRepository;
         this.random = random;
+        this.userService = userService;
     }
 
     @Transactional
-    public void addShuffledDeck(int userId) {
+    public void addShuffledDeck(String userName) {
+        int userId = userService.getUserId(userName);
         shuffleRepository.deleteByUserId(userId);
         List<Integer> shuffledCardIndexes = getShuffledCardIndexes();
         List<Shuffle> cardsToSave = new ArrayList<>();
@@ -38,7 +43,8 @@ public class ShuffleService {
         shuffleRepository.saveAll(cardsToSave);
     }
 
-    public Card getNextCardFromDeck(int userId, int order) {
+    public Card getNextCardFromDeck(String userName, int order) {
+        int userId = userService.getUserId(userName);
         return shuffleRepository.findCardByUserIdAndCardOrder(userId, order)
                 .orElseThrow(() -> new NoSuchElementException("Card not found"));
     }
