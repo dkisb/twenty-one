@@ -7,7 +7,6 @@ function PlayerHand() {
 
   return (
     <div className="flex flex-col items-center justify-center space-y-2">
-      {/* Cards */}
       <div className="flex gap-2 justify-center flex-wrap">
         {state.yourHand.map((card, index) => (
           <img
@@ -18,7 +17,7 @@ function PlayerHand() {
           />
         ))}
       </div>
-      <p className="text-lg font-bold text-white">{user?.Username || 'Player'}</p>
+      <p className="text-lg font-bold text-white">{user?.username || 'Player'}</p>
       <p className="text-lg font-semibold text-white">Value: {yourHandValue}</p>
     </div>
   );
