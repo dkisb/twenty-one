@@ -24,7 +24,7 @@ function handValue(hand) {
 function gameReducer(state, action) {
   switch (action.type) {
     case 'RESET_GAME':
-      return { ...initialState, playerBalance: state.playerBalance, dealerBalance: state.dealerBalance };
+      return { ...initialState, playerBalance: state.creditBalance, dealerBalance: state.dealerBalance };
     case 'ADD_PLAYER_CARD': {
       const newHand = [...state.yourHand, action.card];
       return {

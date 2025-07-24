@@ -9,7 +9,7 @@ function StartPage() {
   const [gameStarted, setGameStarted] = useState(false);
   const { user, setUser } = useUser();
 
-  useEffect(() => {
+/*  useEffect(() => {
     const loggedInUser = location.state;
     console.log(loggedInUser)
     if (loggedInUser) {
@@ -18,7 +18,7 @@ function StartPage() {
     // else setUser({ _id: 1, Username: 'demo', Games: 0, Win: 0, Loss: 0 });
     // Ha mindig demóval akarod, ne töröld ezt a sort.
     // eslint-disable-next-line
-  }, [location.state]);
+  }, [location.state]);*/
 
   const handleStartGame = async () => {
     try {
@@ -30,6 +30,16 @@ function StartPage() {
           'Authorization': `Bearer ${token}`,
         },
       });
+
+      const currentUser = await fetch('/api/user/me', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const userData = await currentUser.json();
+      setUser(userData);
 
       if (!newShuffle.ok) {
         throw new Error('Failed to start a new shuffle');
