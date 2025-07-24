@@ -8,8 +8,8 @@ function GamePage() {
   const { resetGame, setPlayerBalance } = useGame();
 
   React.useEffect(() => {
-    if (user && user.creditBalance != null) {
-      setPlayerBalance(user.creditBalance);
+    if (user && user.playerBalance != null) {
+      setPlayerBalance(user.playerBalance);
     }
     resetGame();
     // eslint-disable-next-line

@@ -21,7 +21,7 @@ function DisplayBalances() {
         <img src="/chips.png" width="125" alt="Player poker chips" />
         <p>
           <strong>
-            {user?.username || 'Player'}'s balance: {state.creditBalance}$
+            {user?.username || 'Player'}'s balance: {state.playerBalance || "No available balance"}$
           </strong>
         </p>
       </div>
