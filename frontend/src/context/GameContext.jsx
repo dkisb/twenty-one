@@ -68,7 +68,7 @@ const GameContext = createContext();
 
 export function GameProvider({ children }) {
   const [state, dispatch] = useReducer(gameReducer, initialState);
-  const { user } = useUser();
+  const { user, setUser } = useUser();
 
   // Segéd értékek
   const yourHandValue = handValue(state.yourHand);
@@ -160,6 +160,7 @@ export function GameProvider({ children }) {
         showEnoughBtn,
         showHelpBtn,
         user,
+        setUser,
         resetGame,
         addPlayerCard,
         addDealerCard,
@@ -177,6 +178,7 @@ export function GameProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useGame() {
   return useContext(GameContext);
 }
