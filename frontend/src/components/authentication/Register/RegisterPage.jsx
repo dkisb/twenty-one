@@ -45,58 +45,43 @@ function RegistrationPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-table-background px-4 py-8">
-      {/* Poker Table Rim */}
       <div className="p-4 sm:p-6 bg-[#4B2E1F] rounded-[90px] shadow-inner w-full max-w-[80rem]">
-        {/* Green Felt Poker Table */}
         <div className="w-full h-[42rem] bg-poker-table rounded-[70px] shadow-2xl flex flex-col items-center justify-center relative text-white px-6 sm:px-8">
-          {/* Decorative heart SVG (top-left) */}
           <img
             src={heartSvg}
             alt="Heart"
             className="absolute top-6 left-8 w-20 md:w-28 opacity-80 -rotate-6 pointer-events-none"
           />
-
-          {/* Decorative acorn SVG (top-right) */}
           <img
             src={acornSvg}
             alt="Acorn"
             className="absolute top-6 right-8 w-20 md:w-28 opacity-80 rotate-12 pointer-events-none"
           />
-
-          {/* Decorative bell SVG (bottom-left) */}
           <img
             src={bellSvg}
             alt="Bell"
             className="absolute bottom-8 left-8 w-20 md:w-28 opacity-80 -rotate-12 pointer-events-none"
           />
-
-          {/* Decorative leaf SVG (bottom-right) */}
           <img
             src={leafSvg}
             alt="Leaf"
             className="absolute bottom-8 right-8 w-20 md:w-28 opacity-80 rotate-6 pointer-events-none"
           />
 
-          {/* Card stack left */}
           <img
             src="/hungarian-cards.png"
             alt="Hungarian Cards Left"
             className="absolute left-10 top-1/2 -translate-y-1/2 w-32 md:w-80 opacity-90 rotate-[1deg] pointer-events-none"
           />
-
-          {/* Card stack right (mirrored) */}
           <img
             src="/hungarian-cards.png"
             alt="Hungarian Cards Right"
             className="absolute right-10 top-1/2 -translate-y-1/2 w-50 md:w-80 opacity-90 rotate-[-1deg] -scale-x-100 pointer-events-none"
           />
-
-          {/* Welcome Message */}
           <h2 className="text-4xl font-extrabold mb-11 drop-shadow-lg text-center text-white">
             Welcome to 21 The Card Game!
           </h2>
 
-          {/* Registration Card */}
           <div className="w-full bg-white border border-gray-200 rounded-lg shadow dark:border-gray-700 dark:bg-gray-800 md:mt-0 sm:max-w-md xl:p-0">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
