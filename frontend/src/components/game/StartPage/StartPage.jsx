@@ -11,6 +11,7 @@ function StartPage() {
 
   useEffect(() => {
     const loggedInUser = location.state;
+    console.log(loggedInUser)
     if (loggedInUser) {
       setUser(loggedInUser);
     }
@@ -21,18 +22,25 @@ function StartPage() {
 
   const handleStartGame = async () => {
     try {
-      const newShuffle = await fetch('/api/shuffle/1', {
+      const token = localStorage.getItem('jwtToken');
+      const newShuffle = await fetch('/api/shuffle', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
       });
+
       if (!newShuffle.ok) {
         throw new Error('Failed to start a new shuffle');
       }
+
       setGameStarted(true);
     } catch (error) {
       console.error('Error starting game:', error);
     }
   };
+
 
   return gameStarted ? <GamePage /> : <StartScreen onStart={handleStartGame} />;
 }

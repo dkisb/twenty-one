@@ -37,11 +37,11 @@ public class WebSecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/**").permitAll()
-                        .requestMatchers("/user/me").hasRole("USER")
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/superadmin/**").hasRole("SUPERADMIN")
-                        .requestMatchers("/game/**").hasRole("USER")
+                        .requestMatchers("/api/user/**").permitAll()
+                        .requestMatchers("/api/user/me").hasRole("USER")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/superadmin/**").hasRole("SUPERADMIN")
+                        .requestMatchers("/api/game/**").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(

@@ -19,7 +19,8 @@ public class ShuffleServiceShufflingTest {
         ShuffleRepository shuffleRepository = Mockito.mock(ShuffleRepository.class);
         CardRepository cardRepository = Mockito.mock(CardRepository.class);
         Random seededRandom = new Random(32);
-        ShuffleService service = new ShuffleService(shuffleRepository, cardRepository, seededRandom);
+        UserService userService = Mockito.mock(UserService.class);
+        ShuffleService service = new ShuffleService(shuffleRepository, cardRepository, seededRandom, userService);
 
         List<Integer> result = service.getShuffledCardIndexes();
         List<Integer> expected = Arrays.asList(

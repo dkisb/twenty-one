@@ -51,4 +51,10 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
+    public int getUserId(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
+        return user.getId();
+    }
+
 }
