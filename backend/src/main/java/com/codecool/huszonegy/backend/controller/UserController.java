@@ -1,7 +1,5 @@
 package com.codecool.huszonegy.backend.controller;
 
-import com.codecool.huszonegy.backend.model.entity.Role;
-import com.codecool.huszonegy.backend.model.entity.UserEntity;
 import com.codecool.huszonegy.backend.model.payload.JwtResponse;
 import com.codecool.huszonegy.backend.model.payload.UserRequest;
 import com.codecool.huszonegy.backend.repository.UserRepository;
@@ -49,18 +47,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody UserRequest loginRequest) {
-
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
-
-        User userDetails = (User) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .toList();
-
-        return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getUsername(), roles));
+        return userService.loginUser(loginRequest);
     }
 
     @GetMapping("/me")

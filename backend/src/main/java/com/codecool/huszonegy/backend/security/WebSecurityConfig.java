@@ -6,6 +6,7 @@ import com.codecool.huszonegy.backend.security.jwt.JwtUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,33 +23,41 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity
 public class WebSecurityConfig {
+    private final UserDetailsServiceImpl userDetailsService;
+    private final AuthEntryPointJwt unauthorizedHandler;
+
+    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, AuthEntryPointJwt unauthorizedHandler) {
+        this.userDetailsService = userDetailsService;
+        this.unauthorizedHandler = unauthorizedHandler;
+    }
+
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http,
-            UserDetailsService userDetailsService,
-            JwtUtils jwtUtils,
-            AuthEntryPointJwt unauthorizedHandler
-    ) throws Exception {
+    public AuthTokenFilter authenticationJwtTokenFilter(JwtUtils jwtUtils) {
+        return new AuthTokenFilter(jwtUtils, userDetailsService);
+    }
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtUtils jwtUtils) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception ->
-                        exception.authenticationEntryPoint(unauthorizedHandler))
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/user/**").permitAll()
-                        .requestMatchers("/api/user/me").hasRole("USER")
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/superadmin/**").hasRole("SUPERADMIN")
-                        .requestMatchers("/api/game/**").hasRole("USER")
+                        .requestMatchers("/api/user/register").permitAll()
+                        .requestMatchers("/api/user/login").permitAll()
+                        .requestMatchers("/api/user/me").authenticated()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(
-                        new AuthTokenFilter(jwtUtils, userDetailsService),
-                        UsernamePasswordAuthenticationFilter.class
-                )
-                .userDetailsService(userDetailsService)
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(authenticationJwtTokenFilter(jwtUtils), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -58,8 +67,7 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authConfig) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 }
