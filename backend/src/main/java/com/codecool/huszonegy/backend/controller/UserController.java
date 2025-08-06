@@ -1,5 +1,8 @@
 package com.codecool.huszonegy.backend.controller;
 
+import com.codecool.huszonegy.backend.model.UserDTO;
+import com.codecool.huszonegy.backend.model.UserUpdateDTO;
+import com.codecool.huszonegy.backend.model.entity.UserEntity;
 import com.codecool.huszonegy.backend.model.payload.JwtResponse;
 import com.codecool.huszonegy.backend.model.payload.UserRequest;
 import com.codecool.huszonegy.backend.repository.UserRepository;
@@ -75,8 +78,8 @@ public class UserController {
         UserEntity currentUser = userRepository.findByUsername(user.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException(user.getUsername()));
         currentUser.setPlayedGames(currentUser.getPlayedGames() + update.addGame());
-        currentUser.setWonGames(currentUser.getWonGames() + update.addGame());
-        currentUser.setLostGames(currentUser.getLostGames() + update.addGame());
+        currentUser.setWonGames(currentUser.getWonGames() + update.addWin());
+        currentUser.setLostGames(currentUser.getLostGames() + update.addLose());
         currentUser.setCreditBalance(currentUser.getCreditBalance() + update.addWinnings());
         userRepository.save(currentUser);
     }
