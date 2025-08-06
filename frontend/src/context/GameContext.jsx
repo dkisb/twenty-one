@@ -4,7 +4,7 @@ import { useUser } from './UserContext';
 const initialState = {
   yourHand: [],
   dealerHand: [],
-  playerBalance: 100,
+  playerBalance: 0,
   dealerBalance: 100,
   totalBet: 0,
   isGameOver: false,
@@ -24,7 +24,11 @@ function handValue(hand) {
 function gameReducer(state, action) {
   switch (action.type) {
     case 'RESET_GAME':
-      return { ...initialState, playerBalance: state.playerBalance, dealerBalance: state.dealerBalance };
+      return {
+        ...initialState,
+        playerBalance: state.playerBalance,
+        dealerBalance: state.dealerBalance,
+      };
     case 'ADD_PLAYER_CARD': {
       const newHand = [...state.yourHand, action.card];
       return {
@@ -67,14 +71,16 @@ function gameReducer(state, action) {
 const GameContext = createContext();
 
 export function GameProvider({ children }) {
-  const [state, dispatch] = useReducer(gameReducer, initialState);
   const { user } = useUser();
 
-  // Segéd értékek
+  const [state, dispatch] = useReducer(gameReducer, {
+    ...initialState,
+    playerBalance: user?.playerBalance ?? 100,
+  });
+
   const yourHandValue = handValue(state.yourHand);
   const dealerHandValue = handValue(state.dealerHand);
 
-  // Gombokhoz tartozó logika
   const [showBetInput, setShowBetInput] = useState(false);
   const [betAmount, setBetAmount] = useState('');
 
@@ -100,6 +106,7 @@ export function GameProvider({ children }) {
     setBetAmount('');
   };
 
+  /** @param {React.ChangeEvent<HTMLInputElement>} e */
   const handleChange = (e) => {
     const val = e.target.value;
     if (val === '') {
@@ -117,10 +124,10 @@ export function GameProvider({ children }) {
   const handlePlaceBet = (e) => {
     e.preventDefault();
     const numBet = parseInt(betAmount, 10);
-    if (numBet > 0) {
+    if (numBet > 0 && numBet <= state.playerBalance) {
       setTotalBet(state.totalBet + numBet * 2);
       setDealerBalance(state.dealerBalance - numBet);
-      setPlayerBalance(state.playerBalance - numBet);
+      setPlayerBalance(state.playerBalance - numBet); // ✅ local balance updates immediately
       setBetSubmitClicked(true);
       setShowBetInput(false);
       setBetAmount('');
@@ -133,47 +140,47 @@ export function GameProvider({ children }) {
   const showMoreBtn = !state.stopClicked && yourHandValue < 20 && !showBetInput;
   const showRaiseBetBtn = !state.stopClicked && !showBetInput && !state.betSubmitClicked && yourHandValue < 20;
   const showEnoughBtn =
-    !state.stopClicked &&
-    yourHandValue >= 15 &&
-    yourHandValue < 22 &&
-    !(yourHandValue === 22 && state.yourHand.length === 2) &&
-    !showBetInput &&
-    !state.betSubmitClicked;
+      !state.stopClicked &&
+      yourHandValue >= 15 &&
+      yourHandValue < 22 &&
+      !(yourHandValue === 22 && state.yourHand.length === 2) &&
+      !showBetInput &&
+      !state.betSubmitClicked;
   const showHelpBtn = !showBetInput;
 
   return (
-    <GameContext.Provider
-      value={{
-        state,
-        dispatch,
-        yourHandValue,
-        dealerHandValue,
-        showBetInput,
-        setShowBetInput,
-        betAmount,
-        setBetAmount,
-        handleRaiseBetClick,
-        handleChange,
-        handlePlaceBet,
-        showMoreBtn,
-        showRaiseBetBtn,
-        showEnoughBtn,
-        showHelpBtn,
-        user,
-        resetGame,
-        addPlayerCard,
-        addDealerCard,
-        setStopClicked,
-        setEnoughReached,
-        setGameOver,
-        setPlayerBalance,
-        setDealerBalance,
-        setTotalBet,
-        setBetSubmitClicked,
-      }}
-    >
-      {children}
-    </GameContext.Provider>
+      <GameContext.Provider
+          value={{
+            state,
+            dispatch,
+            yourHandValue,
+            dealerHandValue,
+            showBetInput,
+            setShowBetInput,
+            betAmount,
+            setBetAmount,
+            handleRaiseBetClick,
+            handleChange,
+            handlePlaceBet,
+            showMoreBtn,
+            showRaiseBetBtn,
+            showEnoughBtn,
+            showHelpBtn,
+            user,
+            resetGame,
+            addPlayerCard,
+            addDealerCard,
+            setStopClicked,
+            setEnoughReached,
+            setGameOver,
+            setPlayerBalance,
+            setDealerBalance,
+            setTotalBet,
+            setBetSubmitClicked,
+          }}
+      >
+        {children}
+      </GameContext.Provider>
   );
 }
 
