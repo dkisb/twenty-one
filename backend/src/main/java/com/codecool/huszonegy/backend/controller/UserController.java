@@ -1,9 +1,5 @@
 package com.codecool.huszonegy.backend.controller;
 
-import com.codecool.huszonegy.backend.model.UserDTO;
-import com.codecool.huszonegy.backend.model.UserUpdateDTO;
-import com.codecool.huszonegy.backend.model.entity.Role;
-import com.codecool.huszonegy.backend.model.entity.UserEntity;
 import com.codecool.huszonegy.backend.model.payload.JwtResponse;
 import com.codecool.huszonegy.backend.model.payload.UserRequest;
 import com.codecool.huszonegy.backend.repository.UserRepository;

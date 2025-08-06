@@ -71,7 +71,8 @@ function gameReducer(state, action) {
 const GameContext = createContext();
 
 export function GameProvider({ children }) {
-  const { user } = useUser();
+  const [state, dispatch] = useReducer(gameReducer, initialState);
+  const { user, setUser } = useUser();
 
   const [state, dispatch] = useReducer(gameReducer, {
     ...initialState,
@@ -149,41 +150,43 @@ export function GameProvider({ children }) {
   const showHelpBtn = !showBetInput;
 
   return (
-      <GameContext.Provider
-          value={{
-            state,
-            dispatch,
-            yourHandValue,
-            dealerHandValue,
-            showBetInput,
-            setShowBetInput,
-            betAmount,
-            setBetAmount,
-            handleRaiseBetClick,
-            handleChange,
-            handlePlaceBet,
-            showMoreBtn,
-            showRaiseBetBtn,
-            showEnoughBtn,
-            showHelpBtn,
-            user,
-            resetGame,
-            addPlayerCard,
-            addDealerCard,
-            setStopClicked,
-            setEnoughReached,
-            setGameOver,
-            setPlayerBalance,
-            setDealerBalance,
-            setTotalBet,
-            setBetSubmitClicked,
-          }}
-      >
-        {children}
-      </GameContext.Provider>
+    <GameContext.Provider
+      value={{
+        state,
+        dispatch,
+        yourHandValue,
+        dealerHandValue,
+        showBetInput,
+        setShowBetInput,
+        betAmount,
+        setBetAmount,
+        handleRaiseBetClick,
+        handleChange,
+        handlePlaceBet,
+        showMoreBtn,
+        showRaiseBetBtn,
+        showEnoughBtn,
+        showHelpBtn,
+        user,
+        setUser,
+        resetGame,
+        addPlayerCard,
+        addDealerCard,
+        setStopClicked,
+        setEnoughReached,
+        setGameOver,
+        setPlayerBalance,
+        setDealerBalance,
+        setTotalBet,
+        setBetSubmitClicked,
+      }}
+    >
+      {children}
+    </GameContext.Provider>
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useGame() {
   return useContext(GameContext);
 }

@@ -22,6 +22,7 @@ function Cards() {
     setDealerBalance,
     setTotalBet,
     resetGame,
+    setUser, // <-- get setUser from useGame
   } = useGame();
   const { user, logout } = useUser();
 
@@ -93,6 +94,27 @@ function Cards() {
     // eslint-disable-next-line
   }, [state.winner]);
 
+  // Effect: update user stats and balance when game ends
+  useEffect(() => {
+    if (!state.winner || !user) return;
+
+    // Calculate new stats
+    const playedGames = (user.Games ?? user.playedGames ?? 0) + 1;
+    const wins = (user.Win ?? user.wins ?? 0) + (state.winner === 'player' ? 1 : 0);
+    const losses = (user.Loss ?? user.losses ?? 0) + (state.winner === 'dealer' ? 1 : 0);
+    const newBalance = state.playerBalance;
+
+    setUser({
+      ...user,
+      Games: playedGames,
+      Win: wins,
+      Loss: losses,
+      Balance: newBalance,
+    });
+    // Optionally, also update on the backend here if needed
+    // eslint-disable-next-line
+  }, [state.winner]);
+
   async function handleMore() {
     const token = localStorage.getItem('jwtToken');
     try {
@@ -100,7 +122,7 @@ function Cards() {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -124,7 +146,7 @@ function Cards() {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       const cardData = await response.json();
@@ -149,7 +171,7 @@ function Cards() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     if (!newShuffle.ok) {

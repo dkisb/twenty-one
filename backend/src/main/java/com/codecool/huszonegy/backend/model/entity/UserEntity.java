@@ -2,6 +2,7 @@ package com.codecool.huszonegy.backend.model.entity;
 
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "users")
+// @Builder
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
