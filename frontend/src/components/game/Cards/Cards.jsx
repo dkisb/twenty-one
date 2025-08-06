@@ -22,7 +22,7 @@ function Cards() {
     setDealerBalance,
     setTotalBet,
     resetGame,
-    setUser, // <-- get setUser from useGame
+    setUser,
   } = useGame();
   const { user, logout } = useUser();
 
@@ -34,7 +34,6 @@ function Cards() {
 
   // Set skipOutcomeRef to true after resetGame (new game)
   useEffect(() => {
-    // We consider a reset has happened when both hands are empty
     if (state.yourHand.length === 0 && state.dealerHand.length === 0) {
       skipOutcomeRef.current = true;
     }
@@ -78,10 +77,47 @@ function Cards() {
         modalRef.current.showModal();
       }, 100);
     }
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dealerHandValue, state.dealerHand.length, state.enoughReached, yourHandValue, state.yourHand.length]);
 
-  // Effect: handle winner/balances
+  // Effect: update user stats and balance when game ends
+  useEffect(() => {
+    if (!state.winner || !user) return;
+
+    const updateUserStats = async () => {
+      const addGame = 1;
+      const addWin = state.winner === 'player' ? 1 : 0;
+      const addLose = state.winner === 'dealer' ? 1 : 0;
+      const addWinnings =
+        state.winner === 'player' ? state.totalBet : state.winner === 'dealer' ? -(state.totalBet / 2) : 0;
+      const token = localStorage.getItem('jwtToken');
+      const updatePayload = { addGame, addWin, addLose, addWinnings };
+
+      // First, send PUT
+      const putRes = await fetch('/api/user/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatePayload),
+      });
+      if (!putRes.ok) throw new Error('Failed to update user');
+
+      // Only after PUT succeeds, fetch updated user
+      const getRes = await fetch('/api/user/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!getRes.ok) throw new Error('Failed to fetch updated user');
+      const updatedUser = await getRes.json();
+      setUser(updatedUser); // normalization in UserContext
+    };
+
+    updateUserStats().catch(console.error);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.winner]);
+
+  // Effect: handle winner/balances (for local state, but backend is source of truth)
   useEffect(() => {
     if (!state.winner) return;
     if (state.winner === 'player') {
@@ -91,28 +127,7 @@ function Cards() {
       setDealerBalance(state.dealerBalance + state.totalBet);
       setTotalBet(0);
     }
-    // eslint-disable-next-line
-  }, [state.winner]);
-
-  // Effect: update user stats and balance when game ends
-  useEffect(() => {
-    if (!state.winner || !user) return;
-
-    // Calculate new stats
-    const playedGames = (user.Games ?? user.playedGames ?? 0) + 1;
-    const wins = (user.Win ?? user.wins ?? 0) + (state.winner === 'player' ? 1 : 0);
-    const losses = (user.Loss ?? user.losses ?? 0) + (state.winner === 'dealer' ? 1 : 0);
-    const newBalance = state.playerBalance;
-
-    setUser({
-      ...user,
-      Games: playedGames,
-      Win: wins,
-      Loss: losses,
-      Balance: newBalance,
-    });
-    // Optionally, also update on the backend here if needed
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.winner]);
 
   async function handleMore() {
@@ -133,6 +148,7 @@ function Cards() {
       const cardData = await response.json();
       addPlayerCard(cardData);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('An error occurred while pulling the next card:', error);
     }
   }
@@ -153,6 +169,7 @@ function Cards() {
       addDealerCard(cardData);
       currentHandValue += cardData.value;
       currentOrder++;
+      // eslint-disable-next-line no-await-in-loop
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
     if (currentHandValue >= threshold) {
@@ -177,12 +194,12 @@ function Cards() {
     if (!newShuffle.ok) {
       throw new Error('Failed to start a new shuffle');
     }
-    resetGame();
+    await resetGame();
     if (modalRef.current) modalRef.current.close();
   }
 
   async function handleQuit() {
-    resetGame();
+    await resetGame();
     const result = logout();
     if (result instanceof Promise) {
       await result;
@@ -196,12 +213,7 @@ function Cards() {
         <div className="w-full h-[42rem] bg-poker-table rounded-[70px] shadow-2xl relative text-white px-6 sm:px-8">
           {/* Left side: Balances */}
           <div className="absolute top-1/2 left-4 transform -translate-y-1/2">
-            <DisplayBalances
-              dealerMax={state.dealerBalance}
-              playerMax={state.playerBalance}
-              currentTotal={state.totalBet}
-              currentUser={user}
-            />
+            <DisplayBalances />
           </div>
           {/* Top center: Dealer hand */}
           <div className="absolute top-4 sm:top-6 left-1/2 transform -translate-x-1/2">
@@ -223,7 +235,6 @@ function Cards() {
       </div>
       <EndGameControls
         ref={modalRef}
-        userData={user}
         outcomeMessage={outcomeMessage}
         handleNewGame={handleNewGame}
         handleQuit={handleQuit}

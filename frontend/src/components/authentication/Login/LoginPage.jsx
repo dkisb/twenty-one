@@ -19,7 +19,7 @@ function LoginPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    localStorage.setItem('jwtToken', token);
+    if (token) localStorage.setItem('jwtToken', token);
   }, [token]);
 
   async function postLogin() {
@@ -32,9 +32,18 @@ function LoginPage() {
       if (!response.ok) {
         throw new Error('Invalid login');
       }
-      const { jwt, username, roles } = await response.json();
+      const { jwt } = await response.json();
       localStorage.setItem('jwtToken', jwt);
-      login({ username, roles });
+      setToken(jwt);
+
+      // Fetch user DTO from backend and set it in context!
+      const userRes = await fetch('/api/user/me', {
+        headers: { Authorization: 'Bearer ' + jwt },
+      });
+      if (!userRes.ok) throw new Error('Could not fetch user info');
+      const userData = await userRes.json();
+      login(userData); // now context has full user info (creditBalance, etc.)
+
       setIsLoggedIn(true);
       setError(null);
     } catch (error) {
@@ -48,9 +57,7 @@ function LoginPage() {
 
   function handleLogin(e) {
     e.preventDefault();
-    postLogin({ username: userName, password });
-    setToken(localStorage.getItem('jwtToken'));
-    //console.log(token);
+    postLogin();
   }
 
   if (isLoggedIn) {
@@ -80,7 +87,6 @@ function LoginPage() {
             alt="Acorn"
             className="absolute bottom-8 right-8 w-20 md:w-28 opacity-80 rotate-6 pointer-events-none"
           />
-
           <img
             src={leafSvg}
             alt="Leaf"

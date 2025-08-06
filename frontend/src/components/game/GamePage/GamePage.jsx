@@ -1,19 +1,14 @@
 import { useGame } from '../../../context/GameContext';
-import { useUser } from '../../../context/UserContext';
 import Cards from '../Cards/Cards';
 import React from 'react';
 
 function GamePage() {
-  const { user } = useUser();
-  const { resetGame, setPlayerBalance } = useGame();
+  const { resetGame } = useGame();
 
   React.useEffect(() => {
-    if (user && user.playerBalance != null) {
-      setPlayerBalance(user.playerBalance);
-    }
     resetGame();
     // eslint-disable-next-line
-  }, [user]);
+  }, []);
 
   return (
     <div className="game-page">

@@ -26,8 +26,8 @@ function gameReducer(state, action) {
     case 'RESET_GAME':
       return {
         ...initialState,
-        playerBalance: state.playerBalance,
-        dealerBalance: state.dealerBalance,
+        playerBalance: action.playerBalance,
+        dealerBalance: action.dealerBalance,
       };
     case 'ADD_PLAYER_CARD': {
       const newHand = [...state.yourHand, action.card];
@@ -71,12 +71,13 @@ function gameReducer(state, action) {
 const GameContext = createContext();
 
 export function GameProvider({ children }) {
-  const [state, dispatch] = useReducer(gameReducer, initialState);
   const { user, setUser } = useUser();
 
+  // Only initialize balances from user at mount time, not on every render
   const [state, dispatch] = useReducer(gameReducer, {
     ...initialState,
-    playerBalance: user?.playerBalance ?? 100,
+    playerBalance: user?.creditBalance ?? 100,
+    dealerBalance: user?.creditBalance >= 100 ? user.creditBalance : 100,
   });
 
   const yourHandValue = handValue(state.yourHand);
@@ -85,7 +86,7 @@ export function GameProvider({ children }) {
   const [showBetInput, setShowBetInput] = useState(false);
   const [betAmount, setBetAmount] = useState('');
 
-  // --- ACTION DISPATCHER függvények ---
+  // --- ACTION DISPATCHER functions ---
   const addPlayerCard = (card) => dispatch({ type: 'ADD_PLAYER_CARD', card });
   const addDealerCard = (card) => dispatch({ type: 'ADD_DEALER_CARD', card });
   const setStopClicked = () => dispatch({ type: 'SET_STOP_CLICKED' });
@@ -95,8 +96,31 @@ export function GameProvider({ children }) {
   const setDealerBalance = (value) => dispatch({ type: 'SET_DEALER_BALANCE', value });
   const setTotalBet = (value) => dispatch({ type: 'SET_TOTAL_BET', value });
   const setBetSubmitClicked = (value) => dispatch({ type: 'SET_BET_SUBMIT_CLICKED', value });
-  const resetGame = () => {
-    dispatch({ type: 'RESET_GAME' });
+
+  // --- Always get balance from backend on reset ---
+  const resetGame = async () => {
+    console.log('resetGame called');
+    const token = localStorage.getItem('jwtToken');
+    let latestCredit = 100;
+    try {
+      const res = await fetch('/api/user/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const latestUser = await res.json();
+        setUser(latestUser); // normalization happens in context
+        latestCredit = latestUser.creditBalance ?? latestUser.playerBalance ?? 100;
+      }
+    } catch (err) {
+      console.error('Error resetting game:', err);
+    }
+    let newDealerBalance = 100;
+    if (latestCredit >= 100) newDealerBalance = latestCredit;
+    dispatch({
+      type: 'RESET_GAME',
+      playerBalance: latestCredit,
+      dealerBalance: newDealerBalance,
+    });
     setShowBetInput(false);
     setBetAmount('');
   };
@@ -128,7 +152,7 @@ export function GameProvider({ children }) {
     if (numBet > 0 && numBet <= state.playerBalance) {
       setTotalBet(state.totalBet + numBet * 2);
       setDealerBalance(state.dealerBalance - numBet);
-      setPlayerBalance(state.playerBalance - numBet); // ✅ local balance updates immediately
+      setPlayerBalance(state.playerBalance - numBet);
       setBetSubmitClicked(true);
       setShowBetInput(false);
       setBetAmount('');
@@ -141,12 +165,12 @@ export function GameProvider({ children }) {
   const showMoreBtn = !state.stopClicked && yourHandValue < 20 && !showBetInput;
   const showRaiseBetBtn = !state.stopClicked && !showBetInput && !state.betSubmitClicked && yourHandValue < 20;
   const showEnoughBtn =
-      !state.stopClicked &&
-      yourHandValue >= 15 &&
-      yourHandValue < 22 &&
-      !(yourHandValue === 22 && state.yourHand.length === 2) &&
-      !showBetInput &&
-      !state.betSubmitClicked;
+    !state.stopClicked &&
+    yourHandValue >= 15 &&
+    yourHandValue < 22 &&
+    !(yourHandValue === 22 && state.yourHand.length === 2) &&
+    !showBetInput &&
+    !state.betSubmitClicked;
   const showHelpBtn = !showBetInput;
 
   return (
@@ -186,7 +210,6 @@ export function GameProvider({ children }) {
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useGame() {
   return useContext(GameContext);
 }
