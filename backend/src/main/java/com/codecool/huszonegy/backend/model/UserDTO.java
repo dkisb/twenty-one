@@ -1,4 +1,4 @@
 package com.codecool.huszonegy.backend.model;
 
-public class UserDTO {
+public record UserDTO(String username, int playedGames, int wonGames, int lostGames, int playerBalance) {
 }
