@@ -17,7 +17,6 @@ public class ShuffleService {
     private final ShuffleRepository shuffleRepository;
     private final CardRepository cardRepository;
     private final Random random;
-    //private final UserRepository userRepository;
     private final UserService userService;
 
     public ShuffleService(ShuffleRepository shuffleRepository, CardRepository cardRepository, Random random, UserService userService) {
