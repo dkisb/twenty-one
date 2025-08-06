@@ -9,7 +9,8 @@ const EndGameControls = forwardRef(function EndGameControlsModal({ outcomeMessag
   }));
 
   const { user } = useUser();
-  const { Games, Win, Loss } = user ?? {};
+  // Use only DTO keys from backend!
+  const { playedGames, wonGames, lostGames } = user ?? {};
   return (
     <dialog ref={innerRef} className="modal bg-transparent" style={{ background: 'rgba(30, 41, 59, 0.35)' }}>
       <div className="modal-box glass bg-white/60 dark:bg-slate-800/80 shadow-2xl border border-white/20 backdrop-blur-lg transition-all">
@@ -20,13 +21,13 @@ const EndGameControls = forwardRef(function EndGameControlsModal({ outcomeMessag
         {user && (
           <div className="flex flex-row justify-center gap-6 mb-6 text-lg font-semibold text-gray-700 dark:text-gray-300">
             <div>
-              <span className="font-bold text-slate-800 dark:text-white">Games:</span> {Games}
+              <span className="font-bold text-slate-800 dark:text-white">Games:</span> {playedGames}
             </div>
             <div>
-              <span className="font-bold text-green-600">Wins:</span> {Win}
+              <span className="font-bold text-green-600">Wins:</span> {wonGames}
             </div>
             <div>
-              <span className="font-bold text-red-600">Losses:</span> {Loss}
+              <span className="font-bold text-red-600">Losses:</span> {lostGames}
             </div>
           </div>
         )}
