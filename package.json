@@ -1,5 +1,18 @@
 {
+  "name": "my-monorepo",
+  "private": true,
+  "packageManager": "npm@10.9.3",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "devDependencies": {
+    "dotenv-cli": "^10.0.0",
     "turbo": "^2.5.8"
+  },
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "test": "turbo run test"
   }
 }

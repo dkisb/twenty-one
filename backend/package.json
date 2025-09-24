@@ -1,0 +1,9 @@
+{
+  "name": "backend",
+  "private": true,
+  "scripts": {
+    "dev": "dotenv -- /opt/homebrew/bin/mvn spring-boot:run",
+    "build": "dotenv -- /opt/homebrew/bin/mvn package",
+    "test": "dotenv -- /opt/homebrew/bin/mvn test"
+  }
+}
