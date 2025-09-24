@@ -117,7 +117,7 @@ export function GameProvider({ children }) {
     // Keep dealer balance independent; only sync to player's balance if dealer is broke
     let newDealerBalance = state.dealerBalance;
     if (newDealerBalance <= 0) {
-      newDealerBalance = latestCredit;
+      newDealerBalance = 100; // Set to fixed minimum value instead of player's balance
     }
     dispatch({
       type: 'RESET_GAME',
