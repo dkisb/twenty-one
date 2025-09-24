@@ -10,37 +10,37 @@
 [![Issues][issues-shield]][issues-url]
 [![License][license-shield]][license-url]
 
-<!-- PROJECT LOGO -->
-<br />
-<div align="center">
-  <a href="https://github.com/dkisb/twenty-one">
-    <img src="public/logo.png" alt="Logo" width="80" height="80">
-  </a>
-
 <h3 align="center">Twenty-One (21) - The Card Game</h3>
 
-  <p align="center">
-    A modern web implementation of the classic Hungarian 21 card game.<br>
-    Play, bet, and challenge the dealer in your browser!
-    <br />
-    <a href="https://github.com/dkisb/twenty-one"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/dkisb/twenty-one">View Demo</a>
-    &middot;
-    <a href="https://github.com/dkisb/twenty-one/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
-    &middot;
-    <a href="https://github.com/dkisb/twenty-one/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
-  </p>
-</div>
+<p align="center">
+  A modern web implementation of the classic Hungarian 21 card game.<br>
+  Play, bet, and challenge the dealer in your browser!
+  <br />
+  <a href="https://github.com/dkisb/twenty-one"><strong>Explore the docs »</strong></a>
+  <br />
+  <br />
+  <a href="https://github.com/dkisb/twenty-one">View Demo</a>
+  &middot;
+  <a href="https://github.com/dkisb/twenty-one/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+  &middot;
+  <a href="https://github.com/dkisb/twenty-one/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+</p>
 
-<!-- TABLE OF CONTENTS -->
+---
+
+## 🎲 What is "huszonegy"?
+
+"huszonegy" (Hungarian for "twenty-one") is a full-stack web application that brings the classic Hungarian 21 card game to your browser. It features a modern, animated UI, betting, persistent player stats, and a robust backend. Play solo against the dealer, track your progress, and enjoy a faithful digital recreation of a beloved card game.
+
+---
+
 <details>
   <summary>Table of Contents</summary>
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
+        <li><a href="#features">Features</a></li>
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
@@ -49,22 +49,24 @@
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
+        <li><a href="#configuration">Configuration</a></li>
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
+    <li><a href="#game-rules">Game Rules</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li><a href="#faq">FAQ</a></li>
   </ol>
 </details>
 
-<!-- ABOUT THE PROJECT -->
+---
 
 ## About The Project
 
-[![Game Screenshot][product-screenshot]](https://github.com/dkisb/twenty-one)
 
 Twenty-One (21) is a modern web version of the classic Hungarian card game. It supports betting, player stats, and a sleek animated UI. Play against the dealer, try to reach 21, and see how many games you can win!
 
@@ -194,9 +196,7 @@ Don't forget to give the project a star! Thanks again!
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- CONTACT -->
+---
 
 ## Contact
 
@@ -204,9 +204,7 @@ Döme Kisbalázs - [@dkisb](https://github.com/dkisb)
 
 Project Link: [https://github.com/dkisb/twenty-one](https://github.com/dkisb/twenty-one)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- ACKNOWLEDGMENTS -->
+---
 
 ## Acknowledgments
 
@@ -215,8 +213,28 @@ Project Link: [https://github.com/dkisb/twenty-one](https://github.com/dkisb/twe
 - [PostgreSQL](https://www.postgresql.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [contrib.rocks](https://contrib.rocks)
+- [Vite](https://vitejs.dev/)
+- [JWT](https://jwt.io/)
+- [Prettier](https://prettier.io/)
+- [ESLint](https://eslint.org/)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+---
+
+## FAQ
+
+**Q: Can I play with friends?**  
+A: Not yet! Multiplayer is on the roadmap.
+
+**Q: Is there a live demo?**  
+A: See the [releases](https://github.com/dkisb/twenty-one/releases) or [View Demo](https://github.com/dkisb/twenty-one) for the latest.
+
+**Q: How do I reset my stats?**  
+A: Currently, you can delete your account and re-register, or contact the maintainer.
+
+**Q: Is this the same as Blackjack?**  
+A: The Hungarian 21 has similar rules to Blackjack, but with some local variations. See the [wiki](https://github.com/dkisb/twenty-one/wiki/Game-Rules) for details.
+
+---
 
 <!-- MARKDOWN LINKS & IMAGES -->
 
@@ -231,8 +249,6 @@ Project Link: [https://github.com/dkisb/twenty-one](https://github.com/dkisb/twe
 [license-shield]: https://img.shields.io/github/license/dkisb/twenty-one.svg?style=for-the-badge
 [license-url]: https://github.com/dkisb/twenty-one/blob/main/LICENSE
 [product-screenshot]: public/screenshot.png
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-url]: https://reactjs.org/
 [React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
 [React-url]: https://react.dev/
 [Vite.js]: https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=FFD62E

@@ -48,8 +48,7 @@ function RegistrationPage() {
       login(userData);
 
       setRegistered(true);
-      // Optionally, navigate to StartPage or main game
-      navigate('/'); // Or wherever the main page is
+      navigate('/');
     } catch (e) {
       setRegError(e.message);
     }
