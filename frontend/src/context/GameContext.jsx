@@ -77,7 +77,7 @@ export function GameProvider({ children }) {
   const [state, dispatch] = useReducer(gameReducer, {
     ...initialState,
     playerBalance: user?.creditBalance ?? 100,
-    dealerBalance: user?.creditBalance >= 100 ? user.creditBalance : 100,
+    dealerBalance: initialState.dealerBalance,
   });
 
   const yourHandValue = handValue(state.yourHand);
@@ -97,7 +97,7 @@ export function GameProvider({ children }) {
   const setTotalBet = (value) => dispatch({ type: 'SET_TOTAL_BET', value });
   const setBetSubmitClicked = (value) => dispatch({ type: 'SET_BET_SUBMIT_CLICKED', value });
 
-  // --- Always get balance from backend on reset ---
+  // --- Always get player balance from backend on reset ---
   const resetGame = async () => {
     console.log('resetGame called');
     const token = localStorage.getItem('jwtToken');
@@ -114,8 +114,11 @@ export function GameProvider({ children }) {
     } catch (err) {
       console.error('Error resetting game:', err);
     }
-    let newDealerBalance = 100;
-    if (latestCredit >= 100) newDealerBalance = latestCredit;
+    // Keep dealer balance independent; only sync to player's balance if dealer is broke
+    let newDealerBalance = state.dealerBalance;
+    if (newDealerBalance <= 0) {
+      newDealerBalance = 100; // Set to fixed minimum value instead of player's balance
+    }
     dispatch({
       type: 'RESET_GAME',
       playerBalance: latestCredit,

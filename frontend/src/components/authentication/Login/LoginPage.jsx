@@ -42,7 +42,7 @@ function LoginPage() {
       });
       if (!userRes.ok) throw new Error('Could not fetch user info');
       const userData = await userRes.json();
-      login(userData); // now context has full user info (creditBalance, etc.)
+      login(userData);
 
       setIsLoggedIn(true);
       setError(null);
