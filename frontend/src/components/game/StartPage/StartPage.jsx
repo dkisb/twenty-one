@@ -1,29 +1,19 @@
-import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import {  useState } from 'react';
 import { useUser } from '../../../context/UserContext';
 import GamePage from '../GamePage/GamePage';
 import StartScreen from './StartScreen';
 
 function StartPage() {
-  const location = useLocation();
+  const API_URL = import.meta.env.VITE_API_URL;
   const [gameStarted, setGameStarted] = useState(false);
   const { user, setUser } = useUser();
 
-/*  useEffect(() => {
-    const loggedInUser = location.state;
-    console.log(loggedInUser)
-    if (loggedInUser) {
-      setUser(loggedInUser);
-    }
-    // else setUser({ _id: 1, Username: 'demo', Games: 0, Win: 0, Loss: 0 });
-    // Ha mindig demóval akarod, ne töröld ezt a sort.
-    // eslint-disable-next-line
-  }, [location.state]);*/
 
+  
   const handleStartGame = async () => {
     try {
       const token = localStorage.getItem('jwtToken');
-      const newShuffle = await fetch('/api/shuffle', {
+      const newShuffle = await fetch(`${API_URL}/api/shuffle`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,7 +21,7 @@ function StartPage() {
         },
       });
 
-      const currentUser = await fetch('/api/user/me', {
+      const currentUser = await fetch(`${API_URL}/api/user/me`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

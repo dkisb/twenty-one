@@ -49,7 +49,7 @@ function RegistrationPage() {
       login(userData);
 
       setRegistered(true);
-      navigate(`${API_URL}/`);
+      navigate(`/`);
     } catch (e) {
       setRegError(e.message);
     }
@@ -66,7 +66,7 @@ function RegistrationPage() {
   }
 
   function switchToLogin() {
-    navigate(`${API_URL}/`);
+    navigate(`/`);
   }
 
   return (

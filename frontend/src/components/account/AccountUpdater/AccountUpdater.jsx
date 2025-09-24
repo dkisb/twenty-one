@@ -9,7 +9,7 @@ function AccountUpdater() {
 
   useEffect(() => {
     if (!user?._id) {
-      navigate(`${API_URL}/`);
+      navigate(`/`);
     }
   }, [user, navigate, API_URL]);
 
@@ -21,7 +21,7 @@ function AccountUpdater() {
       const response = await fetch(`${API_URL}/api/users/${user._id}`, { method: 'DELETE' });
       if (response.ok) {
         console.log(`User ${user._id} has been deleted`);
-        navigate('/');
+        navigate(`/`);
       } else {
         console.error('Failed to delete user.');
       }
@@ -33,7 +33,7 @@ function AccountUpdater() {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const response = await fetch(`/api/users/${user._id}`, {
+      const response = await fetch(`${API_URL}/api/users/${user._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ Username: name, Password: password }),
@@ -42,7 +42,7 @@ function AccountUpdater() {
       if (response.ok) {
         const updatedUser = await response.json();
         console.log('Updated Account:', updatedUser);
-        navigate('/startpage', { state: updatedUser });
+        navigate(`/startpage`, { state: updatedUser });
       } else {
         console.error('Failed to update user.');
       }
@@ -82,7 +82,7 @@ function AccountUpdater() {
         <button className="delete-btn" onClick={handleDelete}>
           Delete Account
         </button>
-        <Link to="/startpage" state={user}>
+        <Link to={`/startpage`} state={user}>
           <button type="button">Cancel</button>
         </Link>
       </div>

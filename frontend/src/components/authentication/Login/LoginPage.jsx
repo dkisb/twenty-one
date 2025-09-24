@@ -53,8 +53,8 @@ function LoginPage() {
   }
 
   function switchToRegister() {
-    navigate(`${API_URL}/register`);
-  }
+    navigate(`/register`);
+  } 
 
   function handleLogin(e) {
     e.preventDefault();

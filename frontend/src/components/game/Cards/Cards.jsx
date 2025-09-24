@@ -205,7 +205,7 @@ function Cards() {
     if (result instanceof Promise) {
       await result;
     }
-    window.location.href = `${API_URL}/`;
+    window.location.href = `/`;
   }
 
   return (
