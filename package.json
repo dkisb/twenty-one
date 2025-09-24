@@ -7,6 +7,7 @@
     "backend"
   ],
   "devDependencies": {
+    "dotenv": "^17.2.2",
     "dotenv-cli": "^10.0.0",
     "turbo": "^2.5.8"
   },
