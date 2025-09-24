@@ -8,6 +8,7 @@ import acornSvg from '../../../assets/acorn.svg';
 import leafSvg from '../../../assets/leaf.svg';
 
 function RegistrationPage() {
+  const API_URL = import.meta.env.VITE_API_URL;
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -18,7 +19,7 @@ function RegistrationPage() {
 
   async function postRegistration() {
     try {
-      const response = await fetch('/api/user/register', {
+      const response = await fetch(`${API_URL}/api/user/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: userName, password, email }),
@@ -28,7 +29,7 @@ function RegistrationPage() {
       }
 
       // Automatically log in the user after registration
-      const loginRes = await fetch('/api/user/login', {
+      const loginRes = await fetch(`${API_URL}/api/user/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: userName, password }),
@@ -40,7 +41,7 @@ function RegistrationPage() {
       localStorage.setItem('jwtToken', jwt);
 
       // Fetch user DTO from backend and set it in context!
-      const userRes = await fetch('/api/user/me', {
+      const userRes = await fetch(`${API_URL}/api/user/me`, {
         headers: { Authorization: 'Bearer ' + jwt },
       });
       if (!userRes.ok) throw new Error('Could not fetch user info');
@@ -48,7 +49,7 @@ function RegistrationPage() {
       login(userData);
 
       setRegistered(true);
-      navigate('/');
+      navigate(`${API_URL}/`);
     } catch (e) {
       setRegError(e.message);
     }
@@ -65,7 +66,7 @@ function RegistrationPage() {
   }
 
   function switchToLogin() {
-    navigate('/');
+    navigate(`${API_URL}/`);
   }
 
   return (

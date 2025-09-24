@@ -2,15 +2,16 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useEffect } from 'react';
 
 function AccountPage() {
+    const API_URL = import.meta.env.VITE_API_URL;
   const location = useLocation();
   const navigate = useNavigate();
   const user = location.state;
 
   useEffect(() => {
     if (!user?._id) {
-      navigate('/');
+      navigate(`${API_URL}/`);
     }
-  }, [user, navigate]);
+  }, [user, navigate, API_URL]);
 
   return (
     <div className="user-account">
@@ -33,10 +34,10 @@ function AccountPage() {
         </p>
       </div>
       <div className="user-buttons">
-        <Link to={`/update/${user?._id}`} state={user}>
+        <Link to={`${API_URL}/update/${user?._id}`} state={user}>
           <button>Update User</button>
         </Link>
-        <Link to="/startpage" state={user}>
+        <Link to={`${API_URL}/startpage`} state={user}>
           <button>Back to Main Page</button>
         </Link>
       </div>

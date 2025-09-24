@@ -8,7 +8,7 @@ function CardStack() {
       aria-label={`Card stack with ${state.numberOfCards || 0} cards remaining`}
     >
       <img
-        src="Back.jpg"
+        src={`/Back.jpg`}
         alt={`Card stack with ${state.numberOfCards || 0} cards remaining`}
         className="max-h-[22vh] w-auto mx-1 shadow-xl rounded"
       />

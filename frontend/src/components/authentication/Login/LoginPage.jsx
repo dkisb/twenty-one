@@ -9,6 +9,7 @@ import acornSvg from '../../../assets/acorn.svg';
 import leafSvg from '../../../assets/leaf.svg';
 
 function LoginPage() {
+  const API_URL = import.meta.env.VITE_API_URL;
   const { login } = useUser();
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +25,7 @@ function LoginPage() {
 
   async function postLogin() {
     try {
-      const response = await fetch('/api/user/login', {
+        const response = await fetch(`${API_URL}/api/user/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: userName, password }),
@@ -37,7 +38,7 @@ function LoginPage() {
       setToken(jwt);
 
       // Fetch user DTO from backend and set it in context!
-      const userRes = await fetch('/api/user/me', {
+      const userRes = await fetch(`${API_URL}/api/user/me`, {
         headers: { Authorization: 'Bearer ' + jwt },
       });
       if (!userRes.ok) throw new Error('Could not fetch user info');
@@ -52,7 +53,7 @@ function LoginPage() {
   }
 
   function switchToRegister() {
-    navigate('/register');
+    navigate(`${API_URL}/register`);
   }
 
   function handleLogin(e) {

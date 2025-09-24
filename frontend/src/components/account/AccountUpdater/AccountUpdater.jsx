@@ -2,22 +2,23 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 function AccountUpdater() {
+    const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const location = useLocation();
   const user = location.state;
 
   useEffect(() => {
     if (!user?._id) {
-      navigate('/');
+      navigate(`${API_URL}/`);
     }
-  }, [user, navigate]);
+  }, [user, navigate, API_URL]);
 
   const [name, setName] = useState(user?.Username || '');
   const [password, setPassword] = useState('');
 
   async function handleDelete() {
     try {
-      const response = await fetch(`/api/users/${user._id}`, { method: 'DELETE' });
+      const response = await fetch(`${API_URL}/api/users/${user._id}`, { method: 'DELETE' });
       if (response.ok) {
         console.log(`User ${user._id} has been deleted`);
         navigate('/');

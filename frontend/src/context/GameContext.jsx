@@ -72,7 +72,7 @@ const GameContext = createContext();
 
 export function GameProvider({ children }) {
   const { user, setUser } = useUser();
-
+  const API_URL = import.meta.env.VITE_API_URL;
   // Only initialize balances from user at mount time, not on every render
   const [state, dispatch] = useReducer(gameReducer, {
     ...initialState,
@@ -103,7 +103,7 @@ export function GameProvider({ children }) {
     const token = localStorage.getItem('jwtToken');
     let latestCredit = 100;
     try {
-      const res = await fetch('/api/user/me', {
+      const res = await fetch(`${API_URL}/api/user/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {

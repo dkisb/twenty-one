@@ -9,6 +9,7 @@ import DisplayButtons from './DisplayButtons';
 import EndGameControls from './EndGameControls';
 
 function Cards() {
+  const API_URL = import.meta.env.VITE_API_URL;
   const {
     state,
     yourHandValue,
@@ -94,7 +95,7 @@ function Cards() {
       const updatePayload = { addGame, addWin, addLose, addWinnings };
 
       // First, send PUT
-      const putRes = await fetch('/api/user/update', {
+      const putRes = await fetch(`${API_URL}/api/user/update`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +106,7 @@ function Cards() {
       if (!putRes.ok) throw new Error('Failed to update user');
 
       // Only after PUT succeeds, fetch updated user
-      const getRes = await fetch('/api/user/me', {
+      const getRes = await fetch(`${API_URL}/api/user/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!getRes.ok) throw new Error('Failed to fetch updated user');
@@ -133,7 +134,7 @@ function Cards() {
   async function handleMore() {
     const token = localStorage.getItem('jwtToken');
     try {
-      const response = await fetch(`/api/shuffle/getnext?order=${state.nextCardInOrder}`, {
+      const response = await fetch(`${API_URL}/api/shuffle/getnext?order=${state.nextCardInOrder}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -158,7 +159,7 @@ function Cards() {
     let currentOrder = startingOrder;
     let currentHandValue = initialHandValue;
     while (currentHandValue < threshold) {
-      const response = await fetch(`/api/shuffle/getnext?order=${currentOrder}`, {
+      const response = await fetch(`${API_URL}/api/shuffle/getnext?order=${currentOrder}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -184,7 +185,7 @@ function Cards() {
 
   async function handleNewGame() {
     const token = localStorage.getItem('jwtToken');
-    const newShuffle = await fetch('/api/shuffle', {
+    const newShuffle = await fetch(`${API_URL}/api/shuffle`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -204,7 +205,7 @@ function Cards() {
     if (result instanceof Promise) {
       await result;
     }
-    window.location.href = '/';
+    window.location.href = `${API_URL}/`;
   }
 
   return (
