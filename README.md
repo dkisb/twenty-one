@@ -19,7 +19,7 @@
   <a href="https://github.com/dkisb/twenty-one"><strong>Explore the docs »</strong></a>
   <br />
   <br />
-  <a href="https://github.com/dkisb/twenty-one">View Demo</a>
+  <a href="https://twenty-one-frontend.vercel.app/">Play the game</a>
   &middot;
   <a href="https://github.com/dkisb/twenty-one/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
   &middot;
