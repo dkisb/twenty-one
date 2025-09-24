@@ -8,7 +8,7 @@ COPY .mvn .mvn
 COPY src src
 
 # build JAR (skip tests for faster image builds)
-RUN ./mvnw clean package -DskipTests
+RUN ./mvnw clean package
 
 # ---------- Runtime stage ----------
 FROM eclipse-temurin:21-jre-alpine
