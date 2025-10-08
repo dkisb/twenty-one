@@ -5,6 +5,7 @@ import com.codecool.huszonegy.backend.security.jwt.AuthTokenFilter;
 import com.codecool.huszonegy.backend.security.jwt.JwtUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -65,10 +66,10 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/user/register").permitAll()
                         .requestMatchers("/api/user/login").permitAll()
                         .requestMatchers("/api/user/me").authenticated()
-                        /// api/shuffle endpoint levedes
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
@@ -82,9 +83,10 @@ public class WebSecurityConfig {
         configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(Arrays.asList(
             "https://twenty-one-frontend.vercel.app",
-            "http://localhost:5173"
+            "http://localhost:5173",
+            "http://localhost:3000"
         ));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

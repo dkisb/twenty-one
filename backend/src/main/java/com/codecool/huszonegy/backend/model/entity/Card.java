@@ -16,6 +16,7 @@ public class Card {
 
     private String name;
     private String color;
+    @Column(name = "\"value\"")
     private int value;
     private String frontImagePath;
 }

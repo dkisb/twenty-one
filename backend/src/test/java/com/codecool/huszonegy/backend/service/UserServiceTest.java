@@ -1,5 +1,9 @@
 package com.codecool.huszonegy.backend.service;
 
+import com.codecool.huszonegy.backend.exception.custom_exceptions.EmailIsAlreadyTakenException;
+import com.codecool.huszonegy.backend.exception.custom_exceptions.UsernameIsAlreadyTakenException;
+import com.codecool.huszonegy.backend.model.UserDTO;
+import com.codecool.huszonegy.backend.model.UserUpdateDTO;
 import com.codecool.huszonegy.backend.model.entity.Role;
 import com.codecool.huszonegy.backend.model.entity.UserEntity;
 import com.codecool.huszonegy.backend.model.payload.JwtResponse;
@@ -12,17 +16,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -95,8 +102,8 @@ class UserServiceTest {
         when(userRepository.existsByUsername("testUser")).thenReturn(true);
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> userService.createUser(request));
-        assertEquals("Error: Username is already taken!", exception.getMessage());
+        UsernameIsAlreadyTakenException exception = assertThrows(UsernameIsAlreadyTakenException.class, () -> userService.createUser(request));
+        assertEquals("Username 'testUser' is already taken", exception.getMessage());
 
         verify(userRepository, times(1)).existsByUsername("testUser");
         verify(userRepository, never()).existsByEmail(anyString());
@@ -116,8 +123,8 @@ class UserServiceTest {
         when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> userService.createUser(request));
-        assertEquals("Error: Email is already in use!", exception.getMessage());
+        EmailIsAlreadyTakenException exception = assertThrows(EmailIsAlreadyTakenException.class, () -> userService.createUser(request));
+        assertEquals("Email is already taken: test@example.com", exception.getMessage());
 
         verify(userRepository, times(1)).existsByUsername("testUser");
         verify(userRepository, times(1)).existsByEmail("test@example.com");
@@ -202,4 +209,110 @@ class UserServiceTest {
 
         verify(userRepository, times(1)).findByUsername("unknownUser");
     }
+
+    @Test
+    void editUserWhenUserUpdateDTOIsValidThenSaveUser() {
+        UserUpdateDTO dto = new UserUpdateDTO(1, 1, 0, 5);
+        User springUser = new User("userName", "password", new HashSet<>());
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(springUser);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        UserEntity currentUser = new UserEntity();
+        currentUser.setUsername("userName");
+        currentUser.setPlayedGames(3);
+        currentUser.setWonGames(2);
+        currentUser.setLostGames(1);
+        currentUser.setCreditBalance(35);
+        when(userRepository.findByUsername(springUser.getUsername())).thenReturn(Optional.of(currentUser));
+
+        Map<String, String> response = userService.editUser(dto);
+
+        ArgumentCaptor<UserEntity> userEntityArgumentCaptor = ArgumentCaptor.forClass(UserEntity.class);
+        verify(userRepository, times(1)).findByUsername(springUser.getUsername());
+        verify(userRepository, times(1)).save(userEntityArgumentCaptor.capture());
+        UserEntity userEntity = userEntityArgumentCaptor.getValue();
+        assertEquals("userName", userEntity.getUsername());
+        assertEquals(4, userEntity.getPlayedGames());
+        assertEquals(3, userEntity.getWonGames());
+        assertEquals(1, userEntity.getLostGames());
+        assertEquals(40, userEntity.getCreditBalance());
+        assertEquals("User 'userName' has been updated", response.get("message"));
+    }
+
+    @Test
+    void editUserWhenUserNotFoundThenThrowsNoSuchElementException() {
+        UserUpdateDTO dto = new UserUpdateDTO(1, 1, 0, 5);
+        User springUser = new User("userName", "password", new HashSet<>());
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(springUser);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(userRepository.findByUsername(springUser.getUsername())).thenReturn(Optional.empty());
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> userService.editUser(dto));
+        assertEquals("User 'userName' not found", exception.getMessage());
+    }
+
+    @Test
+    void getMeWhenUserIsAuthenticatedThenReturnMe() {
+        User springUser = new User("myUserName", "myPassword", new HashSet<>());
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(springUser);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        UserEntity currentUser = new UserEntity();
+        currentUser.setUsername("myUserName");
+        currentUser.setPlayedGames(3);
+        currentUser.setWonGames(2);
+        currentUser.setLostGames(1);
+        currentUser.setCreditBalance(35);
+        when(userRepository.findByUsername("myUserName")).thenReturn(Optional.of(currentUser));
+        UserDTO expected = new UserDTO("myUserName", 3, 2, 1, 35);
+        assertEquals(expected, userService.getMe());
+    }
+
+    @Test
+    void getMeWhenUserNotFoundThenThrowsNoSuchElementException() {
+        User springUser = new User("myUserName", "myPassword", new HashSet<>());
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(springUser);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(userRepository.findByUsername("myUserName")).thenReturn(Optional.empty());
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> userService.getMe());
+        assertEquals("User 'myUserName' not found", exception.getMessage());
+    }
+/*
+    @Test
+    void authenticateUserWithValidCredentialsThenReturnResponse() {
+        UserRequest loginRequest = new UserRequest();
+        loginRequest.setUsername("username");
+        loginRequest.setPassword("password");
+        loginRequest.setEmail("test@test.com");
+        loginRequest.setRole("ROLE_USER");
+        User userDetails = new User(
+                loginRequest.getUsername(),
+                loginRequest.getPassword(),
+                Set.of(new SimpleGrantedAuthority(loginRequest.getRole()))
+        );
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
+        when(jwtUtils.generateJwtToken(authentication)).thenReturn("fake-jwt-token");
+
+        ResponseEntity<?> response = userService.authenticateUser(loginRequest);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isInstanceOf(JwtResponse.class);
+        JwtResponse jwtResponse = (JwtResponse) response.getBody();
+        assertThat(jwtResponse.jwt()).isEqualTo("fake-jwt-token");
+        assertThat(jwtResponse.userName()).isEqualTo("username");
+        assertThat(jwtResponse.roles()).containsExactlyInAnyOrder("ROLE_USER");
+    }
+
+ */
 }

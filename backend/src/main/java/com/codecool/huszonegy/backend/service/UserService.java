@@ -1,5 +1,9 @@
 package com.codecool.huszonegy.backend.service;
 
+import com.codecool.huszonegy.backend.exception.custom_exceptions.EmailIsAlreadyTakenException;
+import com.codecool.huszonegy.backend.exception.custom_exceptions.UsernameIsAlreadyTakenException;
+import com.codecool.huszonegy.backend.model.UserDTO;
+import com.codecool.huszonegy.backend.model.UserUpdateDTO;
 import com.codecool.huszonegy.backend.model.entity.Role;
 import com.codecool.huszonegy.backend.model.entity.UserEntity;
 import com.codecool.huszonegy.backend.model.payload.JwtResponse;
@@ -14,11 +18,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,11 +50,11 @@ public class UserService {
 
     public void createUser(UserRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Error: Username is already taken!");
+            throw new UsernameIsAlreadyTakenException(request.getUsername());
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Error: Email is already in use!");
+            throw new EmailIsAlreadyTakenException(request.getEmail());
         }
 
         UserEntity user = new UserEntity();
@@ -75,7 +83,42 @@ public class UserService {
 
     public int getUserId(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + username))
+                .orElseThrow(() -> new NoSuchElementException("User not found with username: " + username))
                 .getId();
     }
+
+    public Map<String, String> editUser(UserUpdateDTO update) {
+        User user = (User) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        UserEntity currentUser = userRepository.findByUsername(user.getUsername())
+                .orElseThrow(() -> new NoSuchElementException(String.format("User '%s' not found", user.getUsername())));
+        currentUser.setPlayedGames(currentUser.getPlayedGames() + update.addGame());
+        currentUser.setWonGames(currentUser.getWonGames() + update.addWin());
+        currentUser.setLostGames(currentUser.getLostGames() + update.addLose());
+        currentUser.setCreditBalance(currentUser.getCreditBalance() + update.addWinnings());
+        userRepository.save(currentUser);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", String.format("User '%s' has been updated", user.getUsername()));
+        return response;
+    }
+
+    public UserDTO getMe() {
+        User user = (User) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        UserEntity currentUser = userRepository.findByUsername(user.getUsername())
+                .orElseThrow(() -> new NoSuchElementException(String.format("User '%s' not found", user.getUsername())));
+        return new UserDTO(currentUser.getUsername(), currentUser.getPlayedGames(), currentUser.getWonGames(), currentUser.getLostGames(), currentUser.getCreditBalance());
+    }
+/*
+    public ResponseEntity<?> authenticateUser(UserRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtils.generateJwtToken(authentication);
+        User userDetails = (User) authentication.getPrincipal();
+        List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
+        return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getUsername(), roles));
+    }
+
+ */
 }

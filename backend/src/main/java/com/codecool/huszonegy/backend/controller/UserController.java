@@ -23,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -51,36 +52,17 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody UserRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
-        User userDetails = (User) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-        return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getUsername(), roles));
+        return userService.loginUser(loginRequest);
     }
 
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
     public UserDTO me() {
-        User user = (User) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        UserEntity currentUser = userRepository.findByUsername(user.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException(user.getUsername()));
-        return new UserDTO(currentUser.getUsername(), currentUser.getPlayedGames(), currentUser.getWonGames(), currentUser.getLostGames(), currentUser.getCreditBalance());
-        //return "Hello " + user.getUsername() + " " + user.getAuthorities();
+        return userService.getMe();
     }
 
     @PutMapping("/update")
-    public void updateUser(@RequestBody UserUpdateDTO update) {
-        User user = (User) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        UserEntity currentUser = userRepository.findByUsername(user.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException(user.getUsername()));
-        currentUser.setPlayedGames(currentUser.getPlayedGames() + update.addGame());
-        currentUser.setWonGames(currentUser.getWonGames() + update.addWin());
-        currentUser.setLostGames(currentUser.getLostGames() + update.addLose());
-        currentUser.setCreditBalance(currentUser.getCreditBalance() + update.addWinnings());
-        userRepository.save(currentUser);
+    public Map<String, String> updateUser(@RequestBody UserUpdateDTO update) {
+        return userService.editUser(update);
     }
 }

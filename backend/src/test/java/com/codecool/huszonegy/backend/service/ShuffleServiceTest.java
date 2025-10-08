@@ -40,15 +40,12 @@ class ShuffleServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Initialize test data - 32 cards with IDs from 1 to 32
         testCards = IntStream.rangeClosed(1, 32)
                 .mapToObj(i -> {
                     Card card = new Card();
                     card.setId(i);
                     return card;
                 }).collect(Collectors.toList());
-
-        // Create ShuffleService with mocked dependencies
         shuffleService = new ShuffleService(shuffleRepository, cardRepository, random, userService);
     }
 
