@@ -42,9 +42,6 @@ class UserIT {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JwtUtils jwtUtils;
-
     @TestConfiguration
     static class TestSecurityConfig {
         @Bean

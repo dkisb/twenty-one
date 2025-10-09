@@ -5,10 +5,13 @@ import com.codecool.huszonegy.backend.exception.custom_exceptions.UsernameIsAlre
 import com.codecool.huszonegy.backend.model.ErrorMessage;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
@@ -42,6 +45,12 @@ public class ControllerAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessage handleDatabaseError(DataAccessException ex) {
         return new ErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorMessage handleBadCredentialsException(BadCredentialsException ex) {
+        return new ErrorMessage(HttpStatus.UNAUTHORIZED.value(), "Wrong username or password");
     }
 
     @ExceptionHandler(Exception.class)

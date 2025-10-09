@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import LoginPage from '../Login/LoginPage.jsx';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../../../context/UserContext'; // import user context
 import bellSvg from '../../../assets/bell.svg';
 import heartSvg from '../../../assets/heart.svg';
 import acornSvg from '../../../assets/acorn.svg';
@@ -13,9 +11,7 @@ function RegistrationPage() {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [regError, setRegError] = useState(null);
-  const [registered, setRegistered] = useState(false);
   const navigate = useNavigate();
-  const { login } = useUser();
 
   async function postRegistration() {
     try {
@@ -25,30 +21,8 @@ function RegistrationPage() {
         body: JSON.stringify({ username: userName, password, email }),
       });
       if (!response.ok) {
-        throw new Error('Registration failed');
+        throw new Error((await response.json()).message);
       }
-
-      // Automatically log in the user after registration
-      const loginRes = await fetch(`${API_URL}/api/user/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: userName, password }),
-      });
-      if (!loginRes.ok) {
-        throw new Error('Auto-login after registration failed');
-      }
-      const { jwt } = await loginRes.json();
-      localStorage.setItem('jwtToken', jwt);
-
-      // Fetch user DTO from backend and set it in context!
-      const userRes = await fetch(`${API_URL}/api/user/me`, {
-        headers: { Authorization: 'Bearer ' + jwt },
-      });
-      if (!userRes.ok) throw new Error('Could not fetch user info');
-      const userData = await userRes.json();
-      login(userData);
-
-      setRegistered(true);
       navigate(`/`);
     } catch (e) {
       setRegError(e.message);
@@ -58,11 +32,6 @@ function RegistrationPage() {
   function handleRegistration(e) {
     e.preventDefault();
     postRegistration();
-  }
-
-  if (registered) {
-    // Optionally, show StartPage here or redirect
-    return <LoginPage />;
   }
 
   function switchToLogin() {

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StartPage from '../../game/StartPage/StartPage';
 import { useUser } from '../../../context/UserContext';
-import RegistrationPage from '../Register/RegisterPage';
 import bellSvg from '../../../assets/bell.svg';
 import heartSvg from '../../../assets/heart.svg';
 import acornSvg from '../../../assets/acorn.svg';
@@ -10,10 +9,9 @@ import leafSvg from '../../../assets/leaf.svg';
 
 function LoginPage() {
   const API_URL = import.meta.env.VITE_API_URL;
-  const { login } = useUser();
+  const { setUser } = useUser();
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
-  const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [token, setToken] = useState(localStorage.getItem('jwtToken') || null);
@@ -31,7 +29,7 @@ function LoginPage() {
         body: JSON.stringify({ username: userName, password }),
       });
       if (!response.ok) {
-        throw new Error('Invalid login');
+        throw new Error((await response.json()).message);
       }
       const { jwt } = await response.json();
       localStorage.setItem('jwtToken', jwt);
@@ -43,7 +41,7 @@ function LoginPage() {
       });
       if (!userRes.ok) throw new Error('Could not fetch user info');
       const userData = await userRes.json();
-      login(userData);
+      setUser(userData);
 
       setIsLoggedIn(true);
       setError(null);
@@ -63,10 +61,6 @@ function LoginPage() {
 
   if (isLoggedIn) {
     return <StartPage />;
-  }
-
-  if (isRegistering) {
-    return <RegistrationPage onSwitchToLogin={() => setIsRegistering(false)} />;
   }
 
   return (

@@ -90,7 +90,7 @@ function Cards() {
       const addWin = state.winner === 'player' ? 1 : 0;
       const addLose = state.winner === 'dealer' ? 1 : 0;
       const addWinnings =
-        state.winner === 'player' ? state.totalBet : state.winner === 'dealer' ? -(state.totalBet / 2) : 0;
+        state.winner === 'player' ? (state.totalBet / 2) : state.winner === 'dealer' ? -(state.totalBet / 2) : 0;
       const token = localStorage.getItem('jwtToken');
       const updatePayload = { addGame, addWin, addLose, addWinnings };
 

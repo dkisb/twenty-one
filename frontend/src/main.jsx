@@ -15,7 +15,6 @@ import AccountPage from './components/account/AccountPage/AccountPage.jsx';
 import AccountUpdater from './components/account/AccountUpdater/AccountUpdater.jsx';
 
 export default function App() {
-  const [gameKey, setGameKey] = useState(0);
 
   const router = createBrowserRouter([
     { path: '/', element: <LoginPage /> },
@@ -23,7 +22,7 @@ export default function App() {
     { path: '/register', element: <RegisterPage /> },
     {
       path: '/gamepage',
-      element: <GamePage key={gameKey} onNewGame={() => setGameKey((k) => k + 1)} />,
+      element: <GamePage />, 
     },
     { path: '/account', element: <AccountPage /> },
     { path: '/account/update', element: <AccountUpdater /> },

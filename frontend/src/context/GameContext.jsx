@@ -74,11 +74,7 @@ export function GameProvider({ children }) {
   const { user, setUser } = useUser();
   const API_URL = import.meta.env.VITE_API_URL;
   // Only initialize balances from user at mount time, not on every render
-  const [state, dispatch] = useReducer(gameReducer, {
-    ...initialState,
-    playerBalance: user?.creditBalance ?? 100,
-    dealerBalance: initialState.dealerBalance,
-  });
+  const [state, dispatch] = useReducer(gameReducer, initialState);
 
   const yourHandValue = handValue(state.yourHand);
   const dealerHandValue = handValue(state.dealerHand);
