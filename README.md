@@ -201,6 +201,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## Contact
 
 Döme Kisbalázs - [@dkisb](https://github.com/dkisb)
+Zoltán Bencsics - [@bencsicszoli](https://github.com/bencsicszoli)
 
 Project Link: [https://github.com/dkisb/twenty-one](https://github.com/dkisb/twenty-one)
 
