@@ -10,11 +10,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
@@ -51,20 +53,26 @@ class ShuffleServiceTest {
 
     @Test
     void testAddShuffledDeck_SavesShuffledCards() {
-        String userName = "testUser";
+        User springUser = new User("userName", "password", new HashSet<>());
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(springUser);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
         int userId = 1;
-        when(userService.getUserId(userName)).thenReturn(userId);
+        when(userService.getUserId(springUser.getUsername())).thenReturn(userId);
         when(cardRepository.findAll()).thenReturn(testCards);
 
         // Mock random to return a predictable shuffle (incremental order for simplicity)
         when(random.nextInt(anyInt())).thenReturn(0); // Forces minimal shuffling
 
-        shuffleService.addShuffledDeck(userName);
+        shuffleService.addShuffledDeck();
 
         // Verify deleteByUserId is called
         verify(shuffleRepository, times(1)).deleteByUserId(userId);
 
         // Capture and verify saveAll call
+        @SuppressWarnings("unchecked")
         ArgumentCaptor<List<Shuffle>> shuffleCaptor = ArgumentCaptor.forClass(List.class);
         verify(shuffleRepository, times(1)).saveAll(shuffleCaptor.capture());
 
@@ -82,22 +90,32 @@ class ShuffleServiceTest {
 
     @Test
     void testAddShuffledDeck_UserNotFound_ThrowsException() {
-        String userName = "unknownUser";
-        when(userService.getUserId(userName)).thenThrow(new NoSuchElementException("User not found"));
+        User springUser = new User("userName", "password", new HashSet<>());
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(springUser);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(userService.getUserId(springUser.getUsername())).thenThrow(new NoSuchElementException("User not found"));
 
-        assertThrows(NoSuchElementException.class, () -> shuffleService.addShuffledDeck(userName));
+        assertThrows(NoSuchElementException.class, () -> shuffleService.addShuffledDeck());
         verify(shuffleRepository, never()).deleteByUserId(anyInt());
         verify(shuffleRepository, never()).saveAll(anyList());
     }
 
     @Test
     void testAddShuffledDeck_EmptyCardRepository_ThrowsException() {
-        String userName = "testUser";
+        User springUser = new User("userName", "password", new HashSet<>());
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(springUser);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
         int userId = 1;
-        when(userService.getUserId(userName)).thenReturn(userId);
+        when(userService.getUserId(springUser.getUsername())).thenReturn(userId);
         when(cardRepository.findAll()).thenReturn(Collections.emptyList());
 
-        assertThrows(NoSuchElementException.class, () -> shuffleService.addShuffledDeck(userName));
+        assertThrows(NoSuchElementException.class, () -> shuffleService.addShuffledDeck());
         verify(shuffleRepository, times(1)).deleteByUserId(userId);
         verify(shuffleRepository, never()).saveAll(anyList());
     }

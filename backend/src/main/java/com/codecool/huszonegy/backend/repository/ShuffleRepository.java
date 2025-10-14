@@ -15,4 +15,5 @@ public interface ShuffleRepository extends JpaRepository<Shuffle, Integer> {
     //@Modifying
     //@Transactional
     void deleteByUserId(int userId);
+
 }

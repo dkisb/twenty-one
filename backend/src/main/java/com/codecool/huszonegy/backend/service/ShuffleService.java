@@ -4,7 +4,8 @@ import com.codecool.huszonegy.backend.model.entity.Card;
 import com.codecool.huszonegy.backend.model.entity.Shuffle;
 import com.codecool.huszonegy.backend.repository.CardRepository;
 import com.codecool.huszonegy.backend.repository.ShuffleRepository;
-import com.codecool.huszonegy.backend.repository.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,19 +28,24 @@ public class ShuffleService {
     }
 
     @Transactional
-    public void addShuffledDeck(String userName) {
-        int userId = userService.getUserId(userName);
+    public Map<String, String> addShuffledDeck() {
+        User user = (User) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        int userId = userService.getUserId(user.getUsername());
         shuffleRepository.deleteByUserId(userId);
         List<Integer> shuffledCardIndexes = getShuffledCardIndexes();
         List<Shuffle> cardsToSave = new ArrayList<>();
         List<Card> allCards = cardRepository.findAll();
         for (int i = 0; i < shuffledCardIndexes.size(); i++) {
-            int carCardServicedId = shuffledCardIndexes.get(i);
-            Card card = allCards.stream().filter(e -> e.getId() == carCardServicedId).findFirst()
+            int orderInIndexes = shuffledCardIndexes.get(i);
+            Card card = allCards.stream().filter(e -> e.getId() == orderInIndexes).findFirst()
                     .orElseThrow(() -> new NoSuchElementException("Card not found"));
             cardsToSave.add(new Shuffle(card, userId, i + 1));
         }
         shuffleRepository.saveAll(cardsToSave);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Shuffled deck generated for user " + user.getUsername());
+        return response;
     }
 
     public Card getNextCardFromDeck(String userName, int order) {

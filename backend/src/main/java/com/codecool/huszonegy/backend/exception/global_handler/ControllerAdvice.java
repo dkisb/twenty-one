@@ -1,17 +1,15 @@
 package com.codecool.huszonegy.backend.exception.global_handler;
 
 import com.codecool.huszonegy.backend.exception.custom_exceptions.EmailIsAlreadyTakenException;
+import com.codecool.huszonegy.backend.exception.custom_exceptions.NotAllowedOperationException;
 import com.codecool.huszonegy.backend.exception.custom_exceptions.UsernameIsAlreadyTakenException;
 import com.codecool.huszonegy.backend.model.ErrorMessage;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
@@ -27,6 +25,12 @@ public class ControllerAdvice {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorMessage handleEmailAlreadyExists(EmailIsAlreadyTakenException e) {
         return new ErrorMessage(HttpStatus.CONFLICT.value(), e.getMessage());
+    }
+
+    @ExceptionHandler(NotAllowedOperationException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorMessage handleNotAllowedOperation(NotAllowedOperationException e) {
+        return new ErrorMessage(HttpStatus.FORBIDDEN.value(), e.getMessage());
     }
 
     @ExceptionHandler(NoSuchElementException.class)
@@ -58,5 +62,4 @@ public class ControllerAdvice {
     public ErrorMessage handleGeneric(Exception ex) {
         return new ErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
     }
-
 }

@@ -1,9 +1,9 @@
 package com.codecool.huszonegy.backend;
 
 import com.codecool.huszonegy.backend.model.entity.UserEntity;
-import com.codecool.huszonegy.backend.model.payload.UserRequest;
+import com.codecool.huszonegy.backend.model.payload.LoginRequestDTO;
+import com.codecool.huszonegy.backend.model.payload.RegisterRequestDTO;
 import com.codecool.huszonegy.backend.repository.UserRepository;
-import com.codecool.huszonegy.backend.security.jwt.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -62,11 +62,7 @@ class UserIT {
     @Test
     void testCreateUser_Success() {
         // GIVEN
-        UserRequest request = new UserRequest();
-        request.setUsername("john");
-        request.setEmail("john@example.com");
-        request.setPassword("secret");
-
+        RegisterRequestDTO request = new RegisterRequestDTO("john", "secret", "john@example.com");
         // WHEN
         ResponseEntity<Void> response = restTemplate.postForEntity(
                 "http://localhost:" + port + "/api/user/register",
@@ -87,11 +83,7 @@ class UserIT {
         existing.setPassword("encoded");
         userRepository.save(existing);
 
-        UserRequest request = new UserRequest();
-        request.setUsername("jane");
-        request.setEmail("new@example.com");
-        request.setPassword("pass");
-
+        RegisterRequestDTO request = new RegisterRequestDTO("jane", "pass", "new@example.com");
         // WHEN
         ResponseEntity<String> response = restTemplate.postForEntity(
                 "http://localhost:" + port + "/api/user/register",
@@ -112,11 +104,7 @@ class UserIT {
         existing.setPassword("encoded");
         userRepository.save(existing);
 
-        UserRequest request = new UserRequest();
-        request.setUsername("janet");
-        request.setEmail("jane@example.com");
-        request.setPassword("pass");
-
+        RegisterRequestDTO request = new RegisterRequestDTO("janet", "pass", "jane@example.com");
         // WHEN
         ResponseEntity<String> response = restTemplate.postForEntity(
                 "http://localhost:" + port + "/api/user/register",
@@ -145,9 +133,7 @@ class UserIT {
         Mockito.when(auth.getPrincipal()).thenReturn(user);
         Mockito.when(authManager.authenticate(Mockito.any())).thenReturn(auth);
 
-        UserRequest request = new UserRequest();
-        request.setUsername(username);
-        request.setPassword(password);
+        LoginRequestDTO request = new LoginRequestDTO(username, password);
 
         ResponseEntity<String> response = restTemplate.postForEntity(
                 "http://localhost:" + port + "/api/user/login",
