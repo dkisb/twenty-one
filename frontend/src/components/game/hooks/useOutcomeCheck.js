@@ -1,4 +1,4 @@
-import { useGame } from '../../../context/GameContext';
+import { useGame } from '../../../context/GameContext/GameContext';
 
 export function useOutcomeCheck(modalRef, setOutcomeMessage) {
   const { state, dealerHandValue, yourHandValue, setGameOver } = useGame();

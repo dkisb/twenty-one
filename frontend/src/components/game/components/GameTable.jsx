@@ -1,8 +1,8 @@
 import { useState, useRef } from 'react';
-import { useGame } from '../../../context/GameContext';
+import { useGame } from '../../../context/GameContext/GameContext';
 import { useDealerLogic } from '../hooks/useDealerLogic';
 import { useOutcomeCheck } from '../hooks/useOutcomeCheck';
-import { useDrawCard, useNewShuffle } from '../api/shuffleApi';
+import { useDrawCard, useNewShuffle } from '../../api/shuffleApi';
 import { useUser } from '../../../context/UserContext';
 
 import PlayerHand from './PlayerHand';

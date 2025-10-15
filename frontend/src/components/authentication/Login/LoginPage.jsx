@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import StartPage from '../../game/StartPage/StartPage';
+import StartPage from '../../StartPage/StartPage';
 import { useUser } from '../../../context/UserContext';
 import { useLogin, getUserProfile } from '../../api/userApi';
 import bellSvg from '../../../assets/bell.svg';

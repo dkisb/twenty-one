@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserProfile, useUpdateProfile, useDeleteUser } from '../../api/userApi';
+import Spinner from '../../common/Spinner';
 import heartSvg from '../../../assets/heart.svg';
 import acornSvg from '../../../assets/acorn.svg';
 import bellSvg from '../../../assets/bell.svg';
@@ -19,11 +20,7 @@ function AccountUpdater() {
   const [message, setMessage] = useState('');
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        Loading...
-      </div>
-    );
+    return <Spinner />;
   }
 
   if (!user) {

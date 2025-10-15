@@ -1,5 +1,5 @@
-import { useDrawCard } from '../api/shuffleApi';
-import { useGame } from '../../../context/GameContext';
+import { useDrawCard } from '../../api/shuffleApi';
+import { useGame } from '../../../context/GameContext/GameContext';
 
 export function useDealerLogic() {
   const { addDealerCard, setEnoughReached } = useGame();

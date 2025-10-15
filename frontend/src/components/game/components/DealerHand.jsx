@@ -1,4 +1,4 @@
-import { useGame } from '../../../context/GameContext';
+import { useGame } from '../../../context/GameContext/GameContext';
 
 function DealerHand() {
   const { state, dealerHandValue } = useGame();

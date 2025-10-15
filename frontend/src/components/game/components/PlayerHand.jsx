@@ -1,4 +1,4 @@
-import { useGame } from '../../../context/GameContext';
+import { useGame } from '../../../context/GameContext/GameContext';
 import { useUser } from '../../../context/UserContext';
 
 function PlayerHand() {

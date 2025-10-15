@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useUserProfile } from '../../api/userApi';
+import Spinner from '../../common/Spinner';
 import heartSvg from '../../../assets/heart.svg';
 import acornSvg from '../../../assets/acorn.svg';
 import bellSvg from '../../../assets/bell.svg';
@@ -10,11 +11,7 @@ function AccountPage() {
   const { data: user, isLoading, isError } = useUserProfile();
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        Loading...
-      </div>
-    );
+    return <Spinner />;
   }
 
   if (isError || !user) {
