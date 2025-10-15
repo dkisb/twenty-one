@@ -1,5 +1,5 @@
 import {  useState } from 'react';
-import GamePage from '../GamePage/GamePage';
+import GamePage from '../game/GamePage/GamePage';
 import StartScreen from './StartScreen';
 
 function StartPage() {
