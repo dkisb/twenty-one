@@ -4,6 +4,8 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { GameProvider } from './context/GameContext.jsx';
 import { UserProvider } from './context/UserContext.jsx';
 import './index.css';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 // Pages
 import LoginPage from './components/authentication/Login/LoginPage.jsx';
@@ -30,12 +32,16 @@ export default function App() {
   return <RouterProvider router={router} />;
 }
 
+const qc = new QueryClient();
 createRoot(document.getElementById('root')).render(
     <StrictMode>
+      <QueryClientProvider client={qc}>
       <UserProvider>
         <GameProvider>
           <App />
         </GameProvider>
       </UserProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
     </StrictMode>
 );
