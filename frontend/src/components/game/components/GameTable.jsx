@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react';
 import { useGame } from '../../../context/GameContext/GameContext';
-import { useDealerLogic } from '../hooks/useDealerLogic';
 import { useOutcomeCheck } from '../hooks/useOutcomeCheck';
 import { useDrawCard, useNewShuffle } from '../../api/shuffleApi';
 import { useUser } from '../../../context/UserContext';
@@ -15,7 +14,6 @@ import EndGameControls from './EndGameControls';
 function GameTable() {
   const {
     state,
-    dealerHandValue,
     addPlayerCard,
     setStopClicked,
     resetGame,
@@ -24,21 +22,24 @@ function GameTable() {
   const { logout } = useUser();
   const drawCard = useDrawCard();
   const newShuffle = useNewShuffle();
-  const { dealDealerCardsUntilThreshold } = useDealerLogic();
 
   const [outcomeMessage, setOutcomeMessage] = useState('');
   const modalRef = useRef(null);
-  const { checkOutcome } = useOutcomeCheck(modalRef, setOutcomeMessage);
+  const { dealAndCheckOutcome, checkPlayerBustImmediate } = useOutcomeCheck(modalRef, setOutcomeMessage);
 
   async function handleMore() {
     const card = await drawCard.mutateAsync(state.nextCardInOrder);
     addPlayerCard(card);
+
+    // Immediate bust check with up-to-date hand
+    const nextHand = [...state.yourHand, card];
+    const total = nextHand.reduce((sum, c) => sum + c.value, 0);
+    await checkPlayerBustImmediate(nextHand, total);
   }
 
   async function handleStop() {
     setStopClicked();
-    await dealDealerCardsUntilThreshold(state.nextCardInOrder, 1000, 15, dealerHandValue);
-    checkOutcome();
+    await dealAndCheckOutcome();
   }
 
   async function handleNewGame() {

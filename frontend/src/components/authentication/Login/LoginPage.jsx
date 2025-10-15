@@ -44,33 +44,33 @@ function LoginPage() {
           <h2 className="text-4xl font-extrabold mb-11 drop-shadow-lg text-center text-white">
             Welcome to 21 The Card Game!
           </h2>
-          <div className="w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 sm:max-w-md xl:p-0">
+          <div className="w-full bg-gray-800/90 border border-gray-700 rounded-lg shadow-2xl sm:max-w-md xl:p-0 backdrop-blur-sm">
             <div className="p-6 space-y-4 sm:p-8">
-              <h1 className="text-xl font-bold leading-tight text-gray-900 dark:text-white">
+              <h1 className="text-xl font-bold leading-tight text-white">
                 Sign in to your account
               </h1>
               <form className="space-y-4" onSubmit={handleLogin}>
                 <div>
-                  <label htmlFor="username" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  <label htmlFor="username" className="block mb-2 text-sm font-medium text-white">
                     Your username
                   </label>
                   <input
                     type="text"
                     id="username"
-                    className="input input-bordered w-full"
+                    className="input input-bordered w-full bg-gray-700 text-white placeholder-gray-400 border-gray-600"
                     placeholder="username"
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  <label htmlFor="password" className="block mb-2 text-sm font-medium text-white">
                     Password
                   </label>
                   <input
                     type="password"
                     id="password"
-                    className="input input-bordered w-full"
+                    className="input input-bordered w-full bg-gray-700 text-white placeholder-gray-400 border-gray-600"
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -89,12 +89,12 @@ function LoginPage() {
                   {login.isPending ? 'Signing in...' : 'Sign in'}
                 </button>
 
-                <p className="text-sm text-white text-center">
-                  Don’t have an account?{' '}
+                <p className="text-sm text-gray-300 text-center">
+                  Don't have an account?{' '}
                   <button
                     type="button"
                     onClick={() => navigate('/register')}
-                    className="underline"
+                    className="underline text-white hover:text-gray-200"
                   >
                     Sign up
                   </button>

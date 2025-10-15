@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 function getHeaders() {
   const token = localStorage.getItem('jwtToken');

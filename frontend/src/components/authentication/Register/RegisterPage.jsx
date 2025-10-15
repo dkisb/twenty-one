@@ -35,9 +35,9 @@ function RegistrationPage() {
             Welcome to 21 The Card Game!
           </h2>
 
-          <div className="w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 sm:max-w-md xl:p-0">
+          <div className="w-full bg-gray-800/90 border border-gray-700 rounded-lg shadow-2xl sm:max-w-md xl:p-0 backdrop-blur-sm">
             <div className="p-6 space-y-4 sm:p-8">
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-xl font-bold text-white">
                 Create an account
               </h1>
               <form className="space-y-4" onSubmit={handleRegistration}>
@@ -47,7 +47,7 @@ function RegistrationPage() {
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
                   required
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full bg-gray-700 text-white placeholder-gray-400 border-gray-600"
                 />
                 <input
                   type="email"
@@ -55,7 +55,7 @@ function RegistrationPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full bg-gray-700 text-white placeholder-gray-400 border-gray-600"
                 />
                 <input
                   type="password"
@@ -63,7 +63,7 @@ function RegistrationPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full bg-gray-700 text-white placeholder-gray-400 border-gray-600"
                 />
 
                 {register.isError && (
@@ -78,12 +78,12 @@ function RegistrationPage() {
                   {register.isPending ? 'Creating...' : 'Create Account'}
                 </button>
 
-                <p className="text-sm text-white text-center">
+                <p className="text-sm text-gray-300 text-center">
                   Already have an account?{' '}
                   <button
                     type="button"
                     onClick={() => navigate('/')}
-                    className="underline"
+                    className="underline text-white hover:text-gray-200"
                   >
                     Sign in
                   </button>
