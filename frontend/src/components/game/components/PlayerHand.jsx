@@ -1,4 +1,4 @@
-import { useGame } from '../../../context/GameContext';
+import { useGame } from '../../../context/GameContext/GameContext';
 import { useUser } from '../../../context/UserContext';
 
 function PlayerHand() {
@@ -8,11 +8,11 @@ function PlayerHand() {
   return (
     <div className="flex flex-col items-center justify-center space-y-2">
       <div className="flex gap-2 justify-center flex-wrap">
-        {state.yourHand.map((card, index) => (
+        {state.yourHand.map((card, i) => (
           <img
-            key={index}
+            key={i}
             src={card.frontImagePath}
-            alt={`Card ${index + 1}`}
+            alt={`Card ${i + 1}`}
             className="player-card w-24 md:w-28 xl:w-32"
           />
         ))}
