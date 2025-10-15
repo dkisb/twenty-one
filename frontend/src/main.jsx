@@ -29,9 +29,9 @@ export default function AppRouter() {
     { path: '/', element: <LoginPage />, errorElement: <ErrorPage /> },
     { path: '/register', element: <RegisterPage />, errorElement: <ErrorPage /> },
     { path: '/startpage', element: <StartPage />, errorElement: <ErrorPage /> },
-    { path: '/gamepage', element: <GameTable />, errorElement: <ErrorPage /> },
     { path: '/account', element: <AccountPage />, errorElement: <ErrorPage /> },
     { path: '/account/update', element: <AccountUpdater />, errorElement: <ErrorPage /> },
+    { path: '/game', element: <GameTable />, errorElement: <ErrorPage /> },
     { path: '*', element: <ErrorPage /> },
   ]);
 
