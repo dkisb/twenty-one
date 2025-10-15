@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "shuffles")
 public class Shuffle {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -28,4 +29,3 @@ public class Shuffle {
 
     public Shuffle() {}
 }
-

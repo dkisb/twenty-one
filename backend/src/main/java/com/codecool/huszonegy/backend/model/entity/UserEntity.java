@@ -1,14 +1,9 @@
 package com.codecool.huszonegy.backend.model.entity;
 
-
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -16,6 +11,7 @@ import java.util.Set;
 @Table(name = "users")
 // @Builder
 public class UserEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -33,5 +29,4 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private List<Role> roles;
-
 }

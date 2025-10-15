@@ -2,12 +2,13 @@ package com.codecool.huszonegy.backend.service;
 
 import com.codecool.huszonegy.backend.exception.custom_exceptions.EmailIsAlreadyTakenException;
 import com.codecool.huszonegy.backend.exception.custom_exceptions.UsernameIsAlreadyTakenException;
-import com.codecool.huszonegy.backend.model.UserDTO;
-import com.codecool.huszonegy.backend.model.UserUpdateDTO;
+import com.codecool.huszonegy.backend.model.payload.UserDTO;
+import com.codecool.huszonegy.backend.model.payload.UserUpdateDTO;
 import com.codecool.huszonegy.backend.model.entity.Role;
 import com.codecool.huszonegy.backend.model.entity.UserEntity;
 import com.codecool.huszonegy.backend.model.payload.JwtResponse;
-import com.codecool.huszonegy.backend.model.payload.UserRequest;
+import com.codecool.huszonegy.backend.model.payload.LoginRequestDTO;
+import com.codecool.huszonegy.backend.model.payload.RegisterRequestDTO;
 import com.codecool.huszonegy.backend.repository.UserRepository;
 import com.codecool.huszonegy.backend.security.jwt.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,8 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,8 +28,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -59,22 +58,14 @@ class UserServiceTest {
     @Test
     void createUser_Success_CreatesAndSavesUser() {
         // Arrange
-        UserRequest request = new UserRequest();
-        request.setUsername("testUser");
-        request.setEmail("test@example.com");
-        request.setPassword("password123");
+        RegisterRequestDTO request = new RegisterRequestDTO("testUser", "password123", "test@example.com");
 
         when(userRepository.existsByUsername("testUser")).thenReturn(false);
         when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
-        when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> {
-            UserEntity user = invocation.getArgument(0);
-            user.setId(1); // Simulate saving with an ID
-            return user;
-        });
 
         // Act
-        userService.createUser(request);
+        Map<String, String> result = userService.createUser(request);
 
         // Assert
         ArgumentCaptor<UserEntity> userCaptor = ArgumentCaptor.forClass(UserEntity.class);
@@ -85,6 +76,7 @@ class UserServiceTest {
         assertEquals("test@example.com", savedUser.getEmail());
         assertEquals("encodedPassword", savedUser.getPassword());
         assertEquals(List.of(Role.ROLE_USER), savedUser.getRoles());
+        assertEquals("User 'testUser' created successfully", result.get("message"));
 
         verify(userRepository, times(1)).existsByUsername("testUser");
         verify(userRepository, times(1)).existsByEmail("test@example.com");
@@ -94,11 +86,7 @@ class UserServiceTest {
     @Test
     void createUser_DuplicateUsername_ThrowsException() {
         // Arrange
-        UserRequest request = new UserRequest();
-        request.setUsername("testUser");
-        request.setEmail("test@example.com");
-        request.setPassword("password123");
-
+        RegisterRequestDTO request = new RegisterRequestDTO("testUser", "test@example.com", "password123");
         when(userRepository.existsByUsername("testUser")).thenReturn(true);
 
         // Act & Assert
@@ -114,10 +102,7 @@ class UserServiceTest {
     @Test
     void createUser_DuplicateEmail_ThrowsException() {
         // Arrange
-        UserRequest request = new UserRequest();
-        request.setUsername("testUser");
-        request.setEmail("test@example.com");
-        request.setPassword("password123");
+        RegisterRequestDTO request = new RegisterRequestDTO("testUser", "password123", "test@example.com");
 
         when(userRepository.existsByUsername("testUser")).thenReturn(false);
         when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
@@ -135,9 +120,7 @@ class UserServiceTest {
     @Test
     void loginUser_Success_ReturnsJwtResponse() {
         // Arrange
-        UserRequest loginRequest = new UserRequest();
-        loginRequest.setUsername("testUser");
-        loginRequest.setPassword("password123");
+        LoginRequestDTO request = new LoginRequestDTO("testUser", "password123");
 
         Authentication authentication = mock(Authentication.class);
         User userDetails = new User("testUser", "encodedPassword", List.of(new SimpleGrantedAuthority("ROLE_USER")));
@@ -145,16 +128,12 @@ class UserServiceTest {
                 .thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(jwtUtils.generateJwtToken(authentication)).thenReturn("jwtToken");
-
         // Act
-        ResponseEntity<?> response = userService.loginUser(loginRequest);
-
+        JwtResponse response = userService.loginUser(request);
         // Assert
-        assertInstanceOf(JwtResponse.class, response.getBody());
-        JwtResponse jwtResponse = (JwtResponse) response.getBody();
-        assertEquals("jwtToken", jwtResponse.jwt());
-        assertEquals("testUser", jwtResponse.userName());
-        assertEquals(List.of("ROLE_USER"), jwtResponse.roles());
+        assertEquals("jwtToken", response.jwt());
+        assertEquals("testUser", response.userName());
+        assertEquals(List.of("ROLE_USER"), response.roles());
 
         verify(authenticationManager, times(1)).authenticate(
                 argThat(token -> token.getPrincipal().equals("testUser") && token.getCredentials().equals("password123")));
@@ -164,9 +143,7 @@ class UserServiceTest {
     @Test
     void loginUser_AuthenticationFails_ThrowsException() {
         // Arrange
-        UserRequest loginRequest = new UserRequest();
-        loginRequest.setUsername("testUser");
-        loginRequest.setPassword("wrongPassword");
+        LoginRequestDTO loginRequest = new LoginRequestDTO("testUser", "wrongPassword");
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(new RuntimeException("Authentication failed"));
@@ -188,7 +165,6 @@ class UserServiceTest {
         user.setId(1);
         user.setUsername("testUser");
         when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
-
         // Act
         int userId = userService.getUserId(username);
 
@@ -286,33 +262,4 @@ class UserServiceTest {
         NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> userService.getMe());
         assertEquals("User 'myUserName' not found", exception.getMessage());
     }
-/*
-    @Test
-    void authenticateUserWithValidCredentialsThenReturnResponse() {
-        UserRequest loginRequest = new UserRequest();
-        loginRequest.setUsername("username");
-        loginRequest.setPassword("password");
-        loginRequest.setEmail("test@test.com");
-        loginRequest.setRole("ROLE_USER");
-        User userDetails = new User(
-                loginRequest.getUsername(),
-                loginRequest.getPassword(),
-                Set.of(new SimpleGrantedAuthority(loginRequest.getRole()))
-        );
-        Authentication authentication =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(authentication);
-        when(jwtUtils.generateJwtToken(authentication)).thenReturn("fake-jwt-token");
-
-        ResponseEntity<?> response = userService.authenticateUser(loginRequest);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isInstanceOf(JwtResponse.class);
-        JwtResponse jwtResponse = (JwtResponse) response.getBody();
-        assertThat(jwtResponse.jwt()).isEqualTo("fake-jwt-token");
-        assertThat(jwtResponse.userName()).isEqualTo("username");
-        assertThat(jwtResponse.roles()).containsExactlyInAnyOrder("ROLE_USER");
-    }
-
- */
 }

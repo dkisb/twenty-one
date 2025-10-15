@@ -1,17 +1,19 @@
 package com.codecool.huszonegy.backend.service;
 
 import com.codecool.huszonegy.backend.exception.custom_exceptions.EmailIsAlreadyTakenException;
+import com.codecool.huszonegy.backend.exception.custom_exceptions.NotAllowedOperationException;
 import com.codecool.huszonegy.backend.exception.custom_exceptions.UsernameIsAlreadyTakenException;
-import com.codecool.huszonegy.backend.model.UserDTO;
-import com.codecool.huszonegy.backend.model.UserUpdateDTO;
+import com.codecool.huszonegy.backend.model.payload.UserDTO;
+import com.codecool.huszonegy.backend.model.payload.UserUpdateDTO;
 import com.codecool.huszonegy.backend.model.entity.Role;
 import com.codecool.huszonegy.backend.model.entity.UserEntity;
+import com.codecool.huszonegy.backend.model.payload.EditCredentialRequestDTO;
 import com.codecool.huszonegy.backend.model.payload.JwtResponse;
-import com.codecool.huszonegy.backend.model.payload.UserRequest;
+import com.codecool.huszonegy.backend.model.payload.LoginRequestDTO;
+import com.codecool.huszonegy.backend.model.payload.RegisterRequestDTO;
 import com.codecool.huszonegy.backend.repository.UserRepository;
 import com.codecool.huszonegy.backend.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -47,27 +49,27 @@ public class UserService {
         this.jwtUtils = jwtUtils;
     }
 
-    public void createUser(UserRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new UsernameIsAlreadyTakenException(request.getUsername());
+    public Map<String, String> createUser(RegisterRequestDTO request) {
+        if (userRepository.existsByUsername(request.username())) {
+            throw new UsernameIsAlreadyTakenException(request.username());
         }
-
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new EmailIsAlreadyTakenException(request.getEmail());
+        if (userRepository.existsByEmail(request.email())) {
+            throw new EmailIsAlreadyTakenException(request.email());
         }
-
         UserEntity user = new UserEntity();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setUsername(request.username());
+        user.setEmail(request.email());
+        user.setPassword(passwordEncoder.encode(request.password()));
         user.setRoles(List.of(Role.ROLE_USER));
-
         userRepository.save(user);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", String.format("User '%s' created successfully", request.username()));
+        return response;
     }
 
-    public ResponseEntity<?> loginUser(UserRequest loginRequest) {
+    public JwtResponse loginUser(LoginRequestDTO loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
         User userDetails = (User) authentication.getPrincipal();
@@ -75,7 +77,7 @@ public class UserService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getUsername(), roles));
+        return new JwtResponse(jwt, userDetails.getUsername(), roles);
     }
 
     public int getUserId(String username) {
@@ -105,5 +107,40 @@ public class UserService {
         UserEntity currentUser = userRepository.findByUsername(user.getUsername())
                 .orElseThrow(() -> new NoSuchElementException(String.format("User '%s' not found", user.getUsername())));
         return new UserDTO(currentUser.getUsername(), currentUser.getPlayedGames(), currentUser.getWonGames(), currentUser.getLostGames(), currentUser.getCreditBalance());
+    }
+
+    public Map<String, String> deleteMe() {
+        User user = (User) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        UserEntity currentUser = userRepository.findByUsername(user.getUsername())
+                .orElseThrow(() -> new NoSuchElementException(String.format("User '%s' not found", user.getUsername())));
+        userRepository.delete(currentUser);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", String.format("User '%s' has been deleted", user.getUsername()));
+        return response;
+    }
+
+    public Map<String, String> editCredentials(EditCredentialRequestDTO request) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserEntity currentUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new NoSuchElementException(String.format("User '%s' not found", user.getUsername())));
+        Map<String, String> result = new HashMap<>();
+        if (!request.username().equals(user.getUsername()) && userRepository.existsByUsername(request.username())) {
+            throw new UsernameIsAlreadyTakenException(request.username());
+        }
+        if(!passwordEncoder.matches(request.password(), currentUser.getPassword())) {
+            throw new NotAllowedOperationException(String.format("Invalid password for user '%s'", user.getUsername()));
+        }
+        currentUser.setUsername(request.username());
+        if (!request.newPassword().isEmpty()) {
+            currentUser.setPassword(passwordEncoder.encode(request.newPassword()));
+        }
+        userRepository.save(currentUser);
+
+        if (request.username().equals(user.getUsername())) {
+            result.put("message",String.format("User '%s' edited successfully", user.getUsername()));
+        } else {
+            result.put("message", String.format("User '%s' edited successfully. The new username is '%s'.", user.getUsername(), request.username()));
+        }
+        return result;
     }
 }
