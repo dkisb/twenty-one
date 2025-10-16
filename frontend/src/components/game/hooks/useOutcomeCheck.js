@@ -1,10 +1,20 @@
+import toast from 'react-hot-toast';
 import { useGame } from '../../../context/GameContext/GameContext';
 import { useDrawCard } from '../../api/shuffleApi';
 import { useUpdateUserStats, getUserProfile } from '../../api/userApi';
 import { useUser } from '../../../context/UserContext';
 
 export function useOutcomeCheck(modalRef, setOutcomeMessage) {
-  const { state, yourHandValue, addDealerCard, setEnoughReached, setGameOver } = useGame();
+  const {
+    state,
+    yourHandValue,
+    addDealerCard,
+    setEnoughReached,
+    setGameOver,
+    setPlayerBalance,
+    setDealerBalance,
+    setTotalBet,
+  } = useGame();
   const { setUser } = useUser();
   const drawCard = useDrawCard();
   const updateUserStats = useUpdateUserStats();
@@ -31,12 +41,11 @@ export function useOutcomeCheck(modalRef, setOutcomeMessage) {
   }
 
   async function dealAndCheckOutcome() {
-    // Deal cards to dealer until threshold
     let i = state.nextCardInOrder;
     let dealerValue = state.dealerHand.reduce((sum, card) => sum + card.value, 0);
     let dealerHandLength = state.dealerHand.length;
     const threshold = 15;
-    
+
     try {
       while (dealerValue < threshold) {
         const card = await drawCard.mutateAsync(i);
@@ -46,63 +55,142 @@ export function useOutcomeCheck(modalRef, setOutcomeMessage) {
         i++;
         await new Promise((r) => setTimeout(r, 1000));
       }
+
       setEnoughReached();
-      
-      // Calculate final values
+
       const finalDealerValue = dealerValue;
       const finalPlayerValue = yourHandValue;
       const playerHandLength = state.yourHand.length;
-      
-      // Determine winner
       const { winner, message } = determineOutcome(
-        finalDealerValue, 
-        finalPlayerValue, 
-        dealerHandLength, 
+        finalDealerValue,
+        finalPlayerValue,
+        dealerHandLength,
         playerHandLength
       );
-      
-      if (winner) {
-        setGameOver(winner);
-        setOutcomeMessage(message);
-        
-        // Update user stats on backend
-        const hasWon = winner === 'player';
-        const winnings = hasWon ? state.totalBet : -state.totalBet;
-        const updatePayload = {
-          addGame: 1,
-          addWin: hasWon ? 1 : 0,
-          addLose: hasWon ? 0 : 1,
-          addWinnings: winnings,
-        };
-        
-        // Update stats and refresh user data
-        await updateUserStats.mutateAsync(updatePayload);
-        const updatedUser = await getUserProfile();
-        setUser(updatedUser);
-        
-        setTimeout(() => modalRef.current?.showModal(), 100);
+
+      if (!winner) return;
+
+      setGameOver(winner);
+      setOutcomeMessage(message);
+
+      /* ========= 🧮 BALANCE MUTATION SECTION ========= */
+      const pot = state.totalBet;
+      let newPlayerBalance = state.playerBalance;
+      let newDealerBalance = state.dealerBalance;
+
+      if (winner === 'player') {
+        newPlayerBalance += pot;
+      } else if (winner === 'dealer') {
+        newDealerBalance += pot;
       }
+
+      // Safeguard: ensure balances never go negative
+      newPlayerBalance = Math.max(0, newPlayerBalance);
+      newDealerBalance = Math.max(0, newDealerBalance);
+
+      // Update game state + context immediately
+      setPlayerBalance(newPlayerBalance);
+      setDealerBalance(newDealerBalance);
+      setTotalBet(0);
+
+      // Sync user context (for frontend HUD) - ALWAYS update, not just when player wins
+      setUser((prev) =>
+        prev ? { ...prev, playerBalance: newPlayerBalance } : prev
+      );
+
+      /* ========= 🧾 BACKEND UPDATE ========= */
+      const playerWon = winner === 'player';
+      const winnings = playerWon ? pot : -pot;
+
+      const updatePayload = {
+        addGame: 1,
+        addWin: playerWon ? 1 : 0,
+        addLose: playerWon ? 0 : 1,
+        addWinnings: winnings,
+      };
+
+      await updateUserStats.mutateAsync(updatePayload);
+      const updatedUser = await getUserProfile();
+      setUser(updatedUser);
+
+      setTimeout(() => modalRef.current?.showModal(), 100);
     } catch (err) {
       console.error('Dealer loop failed:', err);
+      toast.error('An error occurred during the game. Please try again');
     }
   }
 
   async function checkPlayerBustImmediate(hand, value) {
-    if (value >= 22 && hand.length > 2) {
-      setGameOver('dealer');
-      setOutcomeMessage('Sorry, you lost!');
-      const updatePayload = {
-        addGame: 1,
-        addWin: 0,
-        addLose: 1,
-        addWinnings: -state.totalBet,
-      };
-      await updateUserStats.mutateAsync(updatePayload);
-      const updatedUser = await getUserProfile();
-      setUser(updatedUser);
-      setTimeout(() => modalRef.current?.showModal(), 100);
-    }
+  // FIRE: 22 with only 2 cards → instant win
+  if (value === 22 && hand.length === 2) {
+    setGameOver('player');
+    setOutcomeMessage('FIRE! Congratulations, you won!');
+
+    const pot = state.totalBet;
+
+    // full pot to player
+    let newPlayerBalance = state.playerBalance + pot;
+    
+    // Safeguard: ensure balance never goes negative
+    newPlayerBalance = Math.max(0, newPlayerBalance);
+    
+    setPlayerBalance(newPlayerBalance);
+    setDealerBalance(state.dealerBalance);
+    setTotalBet(0);
+
+    setUser((prev) =>
+      prev ? { ...prev, playerBalance: newPlayerBalance } : prev
+    );
+
+    const updatePayload = {
+      addGame: 1,
+      addWin: 1,
+      addLose: 0,
+      addWinnings: pot,
+    };
+    await updateUserStats.mutateAsync(updatePayload);
+    const updatedUser = await getUserProfile();
+    setUser(updatedUser);
+
+    setTimeout(() => modalRef.current?.showModal(), 100);
+    return;
   }
+
+  // bust detection - 22+ with more than 2 cards
+  if (value >= 22 && hand.length > 2) {
+    setGameOver('dealer');
+    setOutcomeMessage('Sorry, you lost!');
+
+    const pot = state.totalBet;
+    let newDealerBalance = state.dealerBalance + pot;
+    let newPlayerBalance = state.playerBalance; // stays the same (already deducted)
+    
+    // Safeguard: ensure balances never go negative
+    newPlayerBalance = Math.max(0, newPlayerBalance);
+    newDealerBalance = Math.max(0, newDealerBalance);
+    
+    setDealerBalance(newDealerBalance);
+    setPlayerBalance(newPlayerBalance);
+    setTotalBet(0);
+
+    // Update user context immediately
+    setUser((prev) =>
+      prev ? { ...prev, playerBalance: newPlayerBalance } : prev
+    );
+
+    const updatePayload = {
+      addGame: 1,
+      addWin: 0,
+      addLose: 1,
+      addWinnings: -pot,
+    };
+    await updateUserStats.mutateAsync(updatePayload);
+    const updatedUser = await getUserProfile();
+    setUser(updatedUser);
+
+    setTimeout(() => modalRef.current?.showModal(), 100);
+  }
+}
 
   return { dealAndCheckOutcome, checkPlayerBustImmediate };
 }

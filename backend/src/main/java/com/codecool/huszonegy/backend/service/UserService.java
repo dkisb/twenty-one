@@ -94,7 +94,11 @@ public class UserService {
         currentUser.setPlayedGames(currentUser.getPlayedGames() + update.addGame());
         currentUser.setWonGames(currentUser.getWonGames() + update.addWin());
         currentUser.setLostGames(currentUser.getLostGames() + update.addLose());
-        currentUser.setCreditBalance(currentUser.getCreditBalance() + update.addWinnings());
+        
+        // Ensure balance never goes negative
+        int newBalance = currentUser.getCreditBalance() + update.addWinnings();
+        currentUser.setCreditBalance(Math.max(0, newBalance));
+        
         userRepository.save(currentUser);
         Map<String, String> response = new HashMap<>();
         response.put("message", String.format("User '%s' has been updated", user.getUsername()));
