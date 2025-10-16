@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import {
   addPlayerCard,
   addDealerCard,
@@ -22,12 +23,12 @@ export function useGameLogic(state, dispatch, user, setUser, API_URL) {
 
   const handleAddPlayerCard = useCallback(
     (card) => dispatch(addPlayerCard(card)),
-    [dispatch],
+    [dispatch]
   );
 
   const handleAddDealerCard = useCallback(
     (card) => dispatch(addDealerCard(card)),
-    [dispatch],
+    [dispatch]
   );
 
   const resetGame = useCallback(async () => {
@@ -38,17 +39,18 @@ export function useGameLogic(state, dispatch, user, setUser, API_URL) {
       const res = await fetch(`${API_URL}/api/user/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       if (res.ok) {
         const latestUser = await res.json();
         setUser(latestUser);
-        latestCredit = latestUser.creditBalance ?? latestUser.playerBalance ?? 100;
+        latestCredit = latestUser.playerBalance ?? latestUser.creditBalance ?? 100;
       }
-    } catch {
-      console.error('Error resetting game');
+    } catch (err) {
+      console.error('Error resetting game:', err);
+      toast.error('Failed to reset game. Please refresh the page');
     }
 
-    let newDealerBalance = state.dealerBalance <= 0 ? 100 : state.dealerBalance;
-
+    const newDealerBalance = state.dealerBalance <= 0 ? 100 : state.dealerBalance;
     dispatch(resetGameAction(latestCredit, newDealerBalance));
     setShowBetInput(false);
     setBetAmount('');
@@ -59,34 +61,69 @@ export function useGameLogic(state, dispatch, user, setUser, API_URL) {
     setBetAmount('');
   }, []);
 
+  // === use actual user balance instead of stale state value ===
   const handleChange = useCallback(
     (e) => {
       const val = e.target.value;
       if (val === '') return setBetAmount('');
+
       const num = parseInt(val, 10);
-      if (!isNaN(num) && num <= state.playerBalance) setBetAmount(val);
-      else if (num > state.playerBalance)
-        alert(`You cannot bet more than ${state.playerBalance}$`);
+      const currentBalance = user?.playerBalance ?? 0;
+
+      if (!isNaN(num) && num <= currentBalance) {
+        setBetAmount(val);
+      } else if (num > currentBalance) {
+        toast.error(`You cannot bet more than $${currentBalance}`);
+      }
     },
-    [state.playerBalance],
+    [user]
   );
 
   const handlePlaceBet = useCallback(
     (e) => {
       e.preventDefault();
       const numBet = parseInt(betAmount, 10);
-      if (numBet > 0 && numBet <= state.playerBalance) {
-        dispatch(setTotalBet(state.totalBet + numBet * 2));
-        dispatch(setDealerBalance(state.dealerBalance - numBet));
-        dispatch(setPlayerBalance(state.playerBalance - numBet));
-        dispatch(setBetSubmitClicked(true));
-        setShowBetInput(false);
-        setBetAmount('');
-      } else {
-        alert('Enter a valid bet amount.');
+      const currentBalance = user?.playerBalance ?? 0;
+
+      // Additional safeguards against negative balance
+      if (isNaN(numBet) || numBet <= 0) {
+        toast.error('Please enter a valid bet amount greater than 0');
+        return;
       }
+
+      if (numBet > currentBalance) {
+        toast.error(`Insufficient funds. You only have $${currentBalance} available`);
+        return;
+      }
+
+      if (currentBalance <= 0) {
+        toast.error('You have no funds available to bet');
+        return;
+      }
+
+      // Calculate new balance and ensure it won't go negative
+      const newPlayerBalance = currentBalance - numBet;
+      if (newPlayerBalance < 0) {
+        toast.error('This bet would result in a negative balance. Please bet less');
+        return;
+      }
+
+      // update balances locally in game state
+      dispatch(setTotalBet(state.totalBet + numBet * 2));
+      dispatch(setDealerBalance(state.dealerBalance - numBet));
+      dispatch(setPlayerBalance(newPlayerBalance));
+
+      // update user context immediately
+      setUser({
+        ...user,
+        playerBalance: newPlayerBalance,
+      });
+
+      dispatch(setBetSubmitClicked(true));
+      setShowBetInput(false);
+      setBetAmount('');
     },
-    [betAmount, state, dispatch],
+    [betAmount, state, user, dispatch, setUser]
   );
 
   return {

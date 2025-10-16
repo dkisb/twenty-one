@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useRegister } from '../../api/userApi';
 import bellSvg from '../../../assets/bell.svg';
 import heartSvg from '../../../assets/heart.svg';
@@ -13,8 +14,14 @@ function RegistrationPage() {
   const [email, setEmail] = useState('');
 
   const register = useRegister({
-    onSuccess: () => navigate('/'),
-    onError: (err) => console.error(err),
+    onSuccess: () => {
+      toast.success('Account created successfully! Please login');
+      navigate('/');
+    },
+    onError: (err) => {
+      console.error(err);
+      toast.error(err.message || 'Registration failed. Please try again');
+    },
   });
 
   function handleRegistration(e) {

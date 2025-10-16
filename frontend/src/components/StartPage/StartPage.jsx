@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useUserProfile } from '../api/userApi';
 import { useNewShuffle } from '../api/shuffleApi';
 import GameTable from '../game/components/GameTable';
@@ -15,8 +16,10 @@ function StartPage() {
     try {
       await newShuffle.mutateAsync();
       setGameStarted(true);
+      toast.success('Game started! Good luck!');
     } catch (err) {
       console.error('Shuffle error:', err);
+      toast.error('Failed to start game. Please try again');
     }
   };
 

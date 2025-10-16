@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import StartPage from '../../StartPage/StartPage';
 import { useUser } from '../../../context/UserContext';
 import { useLogin, getUserProfile } from '../../api/userApi';
@@ -21,8 +22,12 @@ function LoginPage() {
       const data = await getUserProfile();
       setUser(data);
       setIsLoggedIn(true);
+      toast.success('Successfully logged in!');
     },
-    onError: (err) => console.error(err),
+    onError: (err) => {
+      console.error(err);
+      toast.error(err.message || 'Login failed. Please check your credentials');
+    },
   });
 
   function handleLogin(e) {
