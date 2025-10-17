@@ -37,7 +37,7 @@ function AccountUpdater() {
       {
         onSuccess: (data) => {
           setMessage(data.message || 'Profile updated successfully.');
-          setTimeout(() => navigate('/'), 1500);
+          setTimeout(() => navigate('/'), 1000);
         },
         onError: (err) => setMessage(err.message),
       },
@@ -124,7 +124,7 @@ function AccountUpdater() {
 
                   <button
                     type="button"
-                    onClick={() => navigate('/account')}
+                    onClick={() => navigate('/')}
                     className="btn btn-primary w-full py-2 text-white text-lg"
                   >
                     Cancel
