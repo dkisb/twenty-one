@@ -11,7 +11,6 @@ export function useOutcomeCheck(modalRef, setOutcomeMessage) {
     addDealerCard,
     setEnoughReached,
     setGameOver,
-    setPlayerBalance,
     setDealerBalance,
     setTotalBet,
   } = useGame();
@@ -62,10 +61,10 @@ export function useOutcomeCheck(modalRef, setOutcomeMessage) {
       const finalPlayerValue = yourHandValue;
       const playerHandLength = state.yourHand.length;
       const { winner, message } = determineOutcome(
-        finalDealerValue,
-        finalPlayerValue,
-        dealerHandLength,
-        playerHandLength
+          finalDealerValue,
+          finalPlayerValue,
+          dealerHandLength,
+          playerHandLength
       );
 
       if (!winner) return;
@@ -75,32 +74,20 @@ export function useOutcomeCheck(modalRef, setOutcomeMessage) {
 
       /* ========= 🧮 BALANCE MUTATION SECTION ========= */
       const pot = state.totalBet;
-      let newPlayerBalance = state.playerBalance;
       let newDealerBalance = state.dealerBalance;
 
-      if (winner === 'player') {
-        newPlayerBalance += pot;
-      } else if (winner === 'dealer') {
+      if (winner === 'dealer') {
         newDealerBalance += pot;
       }
 
-      // Safeguard: ensure balances never go negative
-      newPlayerBalance = Math.max(0, newPlayerBalance);
-      newDealerBalance = Math.max(0, newDealerBalance);
-
-      // Update game state + context immediately
-      setPlayerBalance(newPlayerBalance);
+      // ✅ Only modify dealer balance UI; do NOT touch player or user context here
       setDealerBalance(newDealerBalance);
       setTotalBet(0);
 
-      // Sync user context (for frontend HUD) - ALWAYS update, not just when player wins
-      setUser((prev) =>
-        prev ? { ...prev, playerBalance: newPlayerBalance } : prev
-      );
-
       /* ========= 🧾 BACKEND UPDATE ========= */
       const playerWon = winner === 'player';
-      const winnings = playerWon ? pot : -pot;
+      const netChange = pot / 2; // half the pot = actual stake
+      const winnings = playerWon ? netChange : -netChange;
 
       const updatePayload = {
         addGame: 1,
@@ -121,76 +108,53 @@ export function useOutcomeCheck(modalRef, setOutcomeMessage) {
   }
 
   async function checkPlayerBustImmediate(hand, value) {
-  // FIRE: 22 with only 2 cards → instant win
-  if (value === 22 && hand.length === 2) {
-    setGameOver('player');
-    setOutcomeMessage('FIRE! Congratulations, you won!');
+    // FIRE: 22 with only 2 cards → instant win
+    if (value === 22 && hand.length === 2) {
+      setGameOver('player');
+      setOutcomeMessage('FIRE! Congratulations, you won!');
 
-    const pot = state.totalBet;
+      const pot = state.totalBet;
+      setTotalBet(0);
 
-    // full pot to player
-    let newPlayerBalance = state.playerBalance + pot;
-    
-    // Safeguard: ensure balance never goes negative
-    newPlayerBalance = Math.max(0, newPlayerBalance);
-    
-    setPlayerBalance(newPlayerBalance);
-    setDealerBalance(state.dealerBalance);
-    setTotalBet(0);
+      const winnings = pot / 2;
 
-    setUser((prev) =>
-      prev ? { ...prev, playerBalance: newPlayerBalance } : prev
-    );
+      const updatePayload = {
+        addGame: 1,
+        addWin: 1,
+        addLose: 0,
+        addWinnings: winnings,
+      };
 
-    const updatePayload = {
-      addGame: 1,
-      addWin: 1,
-      addLose: 0,
-      addWinnings: pot,
-    };
-    await updateUserStats.mutateAsync(updatePayload);
-    const updatedUser = await getUserProfile();
-    setUser(updatedUser);
+      await updateUserStats.mutateAsync(updatePayload);
+      const updatedUser = await getUserProfile();
+      setUser(updatedUser);
 
-    setTimeout(() => modalRef.current?.showModal(), 100);
-    return;
+      setTimeout(() => modalRef.current?.showModal(), 100);
+      return;
+    }
+
+    // bust detection - 22+ with more than 2 cards
+    if (value >= 22 && hand.length > 2) {
+      setGameOver('dealer');
+      setOutcomeMessage('Sorry, you lost!');
+
+      const pot = state.totalBet;
+      setTotalBet(0);
+
+      const updatePayload = {
+        addGame: 1,
+        addWin: 0,
+        addLose: 1,
+        addWinnings: -(pot / 2),
+      };
+
+      await updateUserStats.mutateAsync(updatePayload);
+      const updatedUser = await getUserProfile();
+      setUser(updatedUser);
+
+      setTimeout(() => modalRef.current?.showModal(), 100);
+    }
   }
-
-  // bust detection - 22+ with more than 2 cards
-  if (value >= 22 && hand.length > 2) {
-    setGameOver('dealer');
-    setOutcomeMessage('Sorry, you lost!');
-
-    const pot = state.totalBet;
-    let newDealerBalance = state.dealerBalance + pot;
-    let newPlayerBalance = state.playerBalance; // stays the same (already deducted)
-    
-    // Safeguard: ensure balances never go negative
-    newPlayerBalance = Math.max(0, newPlayerBalance);
-    newDealerBalance = Math.max(0, newDealerBalance);
-    
-    setDealerBalance(newDealerBalance);
-    setPlayerBalance(newPlayerBalance);
-    setTotalBet(0);
-
-    // Update user context immediately
-    setUser((prev) =>
-      prev ? { ...prev, playerBalance: newPlayerBalance } : prev
-    );
-
-    const updatePayload = {
-      addGame: 1,
-      addWin: 0,
-      addLose: 1,
-      addWinnings: -pot,
-    };
-    await updateUserStats.mutateAsync(updatePayload);
-    const updatedUser = await getUserProfile();
-    setUser(updatedUser);
-
-    setTimeout(() => modalRef.current?.showModal(), 100);
-  }
-}
 
   return { dealAndCheckOutcome, checkPlayerBustImmediate };
 }

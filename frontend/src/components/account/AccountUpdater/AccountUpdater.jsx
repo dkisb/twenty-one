@@ -37,7 +37,7 @@ function AccountUpdater() {
       {
         onSuccess: (data) => {
           setMessage(data.message || 'Profile updated successfully.');
-          setTimeout(() => navigate('/account'), 1500);
+          setTimeout(() => navigate('/'), 1500);
         },
         onError: (err) => setMessage(err.message),
       },

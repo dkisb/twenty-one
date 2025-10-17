@@ -46,7 +46,7 @@ function LoginPage() {
           <img src={acornSvg} alt="Acorn" className="absolute bottom-4 sm:bottom-8 right-4 sm:right-8 w-12 sm:w-16 md:w-20 lg:w-28 opacity-80 rotate-6" />
           <img src={leafSvg} alt="Leaf" className="absolute top-3 sm:top-6 left-4 sm:left-8 w-12 sm:w-16 md:w-20 lg:w-28 opacity-80 -rotate-6" />
 
-          <h2 className="text-sm sm:text-xl md:text-2xl lg:text-4xl font-extrabold mb-2 sm:mb-4 md:mb-8 lg:mb-11 drop-shadow-lg text-center text-white px-2">
+          <h2 className="text-sm sm:text-xl md:text-2xl lg:text-4xl font-extrabold mb-2 sm:mb-4 md:mb-8 lg:mb-11 text-center text-white px-2">
             Welcome to 21 The Card Game!
           </h2>
           <div className="w-[85%] sm:w-[75%] md:w-full bg-gray-800/90 border border-gray-700 rounded-lg shadow-2xl sm:max-w-md xl:p-0 backdrop-blur-sm">
