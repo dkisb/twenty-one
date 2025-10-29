@@ -32,6 +32,8 @@
 
 "huszonegy" (Hungarian for "twenty-one") is a full-stack web application that brings the classic Hungarian 21 card game to your browser. It features a modern, animated UI, betting, persistent player stats, and a robust backend. Play solo against the dealer, track your progress, and enjoy a faithful digital recreation of a beloved card game.
 
+
+![Game screenshot](./screenshots/huszonegy.jpg)
 ---
 
 <details>
